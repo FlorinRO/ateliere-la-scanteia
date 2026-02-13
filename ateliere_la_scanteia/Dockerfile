@@ -60,4 +60,5 @@ RUN python manage.py collectstatic --noinput --clear
 # Notes for Railway:
 # - Bind to 0.0.0.0 and the provided $PORT.
 # - Keep it simple; Railway will restart the service if it crashes.
-CMD set -xe; python manage.py migrate --noinput; gunicorn ateliere_la_scanteia.wsgi:application --bind 0.0.0.0:$PORT
+CMD ["gunicorn", "ateliere_la_scanteia.wsgi:application", "--bind", "0.0.0.0:8080"]
+

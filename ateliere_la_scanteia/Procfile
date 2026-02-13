@@ -1,1 +1,0 @@
-web: sh -c "cd ateliere_la_scanteia && python manage.py migrate --noinput && gunicorn ateliere_la_scanteia.wsgi:application --bind 0.0.0.0:${PORT:-8080}"
