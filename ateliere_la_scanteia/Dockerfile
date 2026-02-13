@@ -2,15 +2,14 @@
 FROM python:3.12-slim-bookworm
 
 # Add user that will be used in the container.
-RUN useradd wagtail
+RUN useradd -m wagtail
 
 # Port used by this container to serve HTTP.
 EXPOSE 8000
 
 # Set environment variables.
 # 1. Force Python stdout and stderr streams to be unbuffered.
-# 2. Set PORT variable that is used by Gunicorn. This should match "EXPOSE"
-#    command.
+# 2. Default PORT (we will still bind to 8000 explicitly to avoid $PORT issues).
 ENV PYTHONUNBUFFERED=1 \
     PORT=8000
 
@@ -38,27 +37,20 @@ RUN pip install --no-cache-dir -r /requirements.txt
 # Use /app folder as a directory where the source code is stored.
 WORKDIR /app
 
-# Set this directory to be owned by the "wagtail" user. This Wagtail project
-# uses SQLite, the folder needs to be owned by the user that
-# will be writing to the database file.
-RUN chown wagtail:wagtail /app
-
 # Copy the source code of the project into the container.
-COPY --chown=wagtail:wagtail . .
+COPY . .
 
-# Use user "wagtail" to run the build commands below and the server itself.
+# Make sure files are owned by wagtail (important for sqlite, media, etc.)
+RUN chown -R wagtail:wagtail /app
+
+# Ensure entrypoint is executable (so you DON'T need to run chmod locally).
+RUN chmod +x /app/entrypoint.sh
+
+# Switch to non-root user.
 USER wagtail
 
 # Collect static files.
 RUN python manage.py collectstatic --noinput --clear
 
-# Runtime command that executes when "docker run" is called, it does the
-# following:
-#   1. Migrate the database.
-#   2. Start the application server.
-#
-# Notes for Railway:
-# - Bind to 0.0.0.0 and the provided $PORT.
-# - Keep it simple; Railway will restart the service if it crashes.
-CMD ["gunicorn", "ateliere_la_scanteia.wsgi:application", "--bind", "0.0.0.0:8000"]
-
+# Use entrypoint to run migrations then start gunicorn.
+CMD ["/app/entrypoint.sh"]
