@@ -24,12 +24,16 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libwebp-dev \
  && rm -rf /var/lib/apt/lists/*
 
-# Install the application server.
-RUN pip install "gunicorn==20.0.4"
+# ✅ Ensure setuptools is available (pkg_resources) and keep tooling up-to-date.
+# This fixes: ModuleNotFoundError: No module named 'pkg_resources'
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# ✅ Install the application server (newer Gunicorn is safer on modern Python).
+RUN pip install --no-cache-dir "gunicorn>=21.2,<23"
 
 # Install the project requirements.
 COPY requirements.txt /
-RUN pip install -r /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
 
 # Use /app folder as a directory where the source code is stored.
 WORKDIR /app
@@ -52,9 +56,8 @@ RUN python manage.py collectstatic --noinput --clear
 # following:
 #   1. Migrate the database.
 #   2. Start the application server.
-# WARNING:
-#   Migrating database at the same time as starting the server IS NOT THE BEST
-#   PRACTICE. The database should be migrated manually or using the release
-#   phase facilities of your hosting platform. This is used only so the
-#   Wagtail instance can be started with a simple "docker run" command.
-CMD set -xe; python manage.py migrate --noinput; gunicorn ateliere_la_scanteia.wsgi:application
+#
+# Notes for Railway:
+# - Bind to 0.0.0.0 and the provided $PORT.
+# - Keep it simple; Railway will restart the service if it crashes.
+CMD set -xe; python manage.py migrate --noinput; gunicorn ateliere_la_scanteia.wsgi:application --bind 0.0.0.0:$PORT

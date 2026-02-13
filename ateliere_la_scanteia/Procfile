@@ -1,0 +1,1 @@
+web: cd ateliere_la_scanteia && gunicorn ateliere_la_scanteia.wsgi:application --bind 0.0.0.0:$PORT
