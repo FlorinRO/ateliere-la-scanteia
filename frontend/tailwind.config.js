@@ -3,15 +3,18 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    "../**/templates/**/*.html",
+
+    // ✅ Only scan Django templates in known folders (avoid ../**/ which can explode)
+    "../ateliere_la_scanteia/templates/**/*.html",
+    "../core/templates/**/*.html",
   ],
   theme: {
     extend: {
       colors: {
         canvas: {
-          DEFAULT: "#f6f3ee",   // crem galerie (background principal)
-          top: "#f8f5f0",       // ușor mai deschis (sus)
-          bottom: "#f2efe9",    // ușor mai cald (jos)
+          DEFAULT: "#f6f3ee", // crem galerie (background principal)
+          top: "#f8f5f0", // ușor mai deschis (sus)
+          bottom: "#f2efe9", // ușor mai cald (jos)
         },
         ink: {
           50: "#fafafa",
