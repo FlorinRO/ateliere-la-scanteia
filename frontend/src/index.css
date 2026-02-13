@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+      Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  }
+
+  /* ✅ Page scroll stays on window */
+  html,
+  body {
+    min-height: 100%;
+    background: #f4f1ea; /* fallback for bg-canvas-bottom */
+    overflow-x: hidden; /* ok */
+    overflow-y: auto;   /* ✅ allow page scroll */
+  }
+
+  /* Root should NOT force internal scrolling */
+  #root {
+    min-height: 100%;
+  }
+
+  /* Optional: reduce scroll chaining bounce without killing scroll */
+  body {
+    overscroll-behavior-y: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Cormorant Garamond", ui-serif, Georgia, Cambria,
+      "Times New Roman", Times, serif;
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  /* ===========================
+     SMILEY (CSS drawn, elegant)
+     =========================== */
+
+  @keyframes als-smiley-pop {
+    0% {
+      transform: translate(-50%, 8px) scale(0.6);
+      opacity: 0;
+    }
+    45% {
+      transform: translate(-50%, -16px) scale(1.05);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -20px) scale(1);
+      opacity: 1;
+    }
+  }
+
+  .als-smiley {
+    position: absolute;
+    left: 50%;
+    top: -28px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9999px;
+    background: #fff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+  }
+
+  .group:hover .als-smiley {
+    animation: als-smiley-pop 520ms ease-out forwards;
+  }
+
+  .als-smiley::before,
+  .als-smiley::after {
+    content: "";
+    position: absolute;
+    top: 11px;
+    width: 4px;
+    height: 4px;
+    background: #1c1917;
+    border-radius: 9999px;
+  }
+
+  .als-smiley::before {
+    left: 10px;
+  }
+
+  .als-smiley::after {
+    right: 10px;
+  }
+
+  .als-smiley-mouth {
+    position: absolute;
+    bottom: 9px;
+    left: 50%;
+    width: 14px;
+    height: 8px;
+    border-bottom: 2px solid #1c1917;
+    border-radius: 0 0 9999px 9999px;
+    transform: translateX(-50%);
+  }
+
+  /* ===========================
+     CONFETTI (COLORATE, AFARĂ)
+     =========================== */
+
+  @keyframes als-confetti {
+    0% {
+      transform: translate(-50%, -50%) translate(0, 0) rotate(0deg);
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) translate(var(--x), var(--y))
+        rotate(var(--r));
+      opacity: 0;
+    }
+  }
+
+  .als-confetti {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 6px;
+    height: 10px;
+    border-radius: 2px;
+    opacity: 0;
+  }
+
+  .group:hover .als-confetti {
+    animation: als-confetti 900ms ease-out forwards;
+  }
+
+  .confetti-1 { background: #7f1d1d; }
+  .confetti-2 { background: #f59e0b; }
+  .confetti-3 { background: #0f766e; }
+  .confetti-4 { background: #2563eb; }
+  .confetti-5 { background: #be185d; }
+
+  /* ===========================
+     MASKS (fade pentru blur)
+     =========================== */
+
+  .mask-fade-vertical {
+    -webkit-mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.85) 30%,
+      rgba(0, 0, 0, 0.45) 60%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.85) 30%,
+      rgba(0, 0, 0, 0.45) 60%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
+
+  .mask-fade-bottom {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 68%,
+      rgba(0, 0, 0, 0.72) 80%,
+      rgba(0, 0, 0, 0.25) 92%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 68%,
+      rgba(0, 0, 0, 0.72) 80%,
+      rgba(0, 0, 0, 0.25) 92%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
+}

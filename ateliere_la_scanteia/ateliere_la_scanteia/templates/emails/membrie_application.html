@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Aplicație nouă (Membrie)</title>
+  </head>
+  <body style="margin:0;padding:0;background:#0b0b0c;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0b0b0c;padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#121214;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);">
+            
+            <!-- Header -->
+            <tr>
+              <td style="padding:22px 22px 10px;">
+                <div style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#ff4d4d;">
+                  Membrie • Aplicație nouă
+                </div>
+
+                <div style="margin-top:8px;font-size:22px;line-height:1.2;color:#ffffff;font-weight:700;">
+                  {{ child_name }} — {{ expectation_label }}
+                </div>
+              </td>
+            </tr>
+
+            <!-- Divider -->
+            <tr>
+              <td style="padding:0 22px;">
+                <div style="height:1px;background:rgba(255,255,255,0.10);"></div>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="padding:18px 22px 22px;">
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  
+                  <!-- Parent -->
+                  <tr>
+                    <td style="padding:0 0 14px;">
+                      <div style="font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:6px;">
+                        Părinte
+                      </div>
+
+                      <div style="font-size:16px;color:#fff;font-weight:700;">
+                        {{ parent_name }}
+                      </div>
+
+                      <div style="margin-top:8px;font-size:14px;color:rgba(255,255,255,0.80);">
+                        Telefon:
+                        <a href="tel:{{ phone }}" style="color:#fff;text-decoration:underline;">
+                          {{ phone }}
+                        </a>
+                        <br/>
+                        Email:
+                        <a href="mailto:{{ email }}" style="color:#fff;text-decoration:underline;">
+                          {{ email }}
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Child -->
+                  <tr>
+                    <td style="padding:0 0 14px;">
+                      <div style="font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:6px;">
+                        Copil
+                      </div>
+
+                      <div style="font-size:16px;color:#fff;font-weight:700;">
+                        {{ child_name }}
+                      </div>
+
+                      <div style="margin-top:6px;font-size:14px;color:rgba(255,255,255,0.80);">
+                        Vârsta:
+                        <b style="color:#fff;">{{ child_age }}</b>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Art Relationship -->
+                  <tr>
+                    <td style="padding:0;">
+                      <div style="font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:8px;">
+                        Relația cu arta
+                      </div>
+
+                      <div style="font-size:14px;line-height:1.6;color:rgba(255,255,255,0.88);white-space:pre-wrap;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);padding:14px;border-radius:12px;">
+{{ art_relationship }}
+                      </div>
+                    </td>
+                  </tr>
+
+                </table>
+
+                <!-- Footer -->
+                <div style="margin-top:22px;text-align:center;font-size:12px;color:rgba(255,255,255,0.55);letter-spacing:0.05em;">
+                  • Ateliere la Scânteia
+                </div>
+
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

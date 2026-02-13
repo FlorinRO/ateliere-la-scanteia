@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- ✅ FAVICON (custom) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ✅ Meta (client) -->
+    <title>
+      Ateliere la Scânteia | Cursuri artă copii | Atelier de pictură Casa Presei
+    </title>
+    <meta
+      name="description"
+      content="Descoperă magia creativității la Ateliere la Scânteia, în Casa Presei, București. Cursuri de pictură pentru copii în Sectorul 1. Activități creative în weekend și cursuri în zona de Nord."
+    />
+
+    <!-- ✅ Keywords (kept as-is, even if modern SEO relies less on this tag) -->
+    <meta
+      name="keywords"
+      content="Ateliere la Scânteia Casa Presei, hub creativ copii București, educație prin artă sector 1, ateliere de creație Casa Presei Libere, dezvoltare personală prin desen, activități extrașcolare Nord București, cursuri pictură copii București, atelier de pictură pentru copii, ateliere de weekend pentru copii, școală de pictură pentru copii sector 1, ateliere artă lângă Herăstrău, activități copii Piața Presei, cursuri creative în sector 1"
+    />
+
+    <!-- ✅ Canonical + OG URL (recommended for Google + shares) -->
+    <link rel="canonical" href="https://atelierelascanteia.ro/" />
+    <meta property="og:url" content="https://atelierelascanteia.ro/" />
+
+    <!-- ✅ Open Graph (Facebook / WhatsApp / LinkedIn) -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Ateliere la Scânteia | Cursuri artă copii | Atelier de pictură Casa Presei"
+    />
+    <meta
+      property="og:description"
+      content="Descoperă magia creativității la Ateliere la Scânteia, în Casa Presei, București. Cursuri de pictură pentru copii în Sectorul 1. Activități creative în weekend și cursuri în zona de Nord."
+    />
+
+    <!-- ✅ IMPORTANT: use ABSOLUTE URL for og:image -->
+    <meta
+      property="og:image"
+      content="https://atelierelascanteia.ro/Ateliere_la_ScanteiaOG.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Optional but helpful -->
+    <meta property="og:image:alt" content="Ateliere la Scânteia" />
+
+    <!-- ✅ Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Ateliere la Scânteia | Cursuri artă copii | Atelier de pictură Casa Presei"
+    />
+    <meta
+      name="twitter:description"
+      content="Descoperă magia creativității la Ateliere la Scânteia, în Casa Presei, București. Cursuri de pictură pentru copii în Sectorul 1. Activități creative în weekend și cursuri în zona de Nord."
+    />
+    <meta
+      name="twitter:image"
+      content="https://atelierelascanteia.ro/Ateliere_la_ScanteiaOG.jpg"
+    />
+
+    <!-- ✅ JSON-LD (client) - kept as-is in content, only made VALID JSON -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://atelierelascanteia.ro/#parentorg",
+            "name": "Atelierele Scânteia",
+            "description": "Platformă culturală și artistică multidisciplinară situată în Casa Presei.",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Piața Presei Libere Nr. 1",
+              "addressLocality": "București",
+              "addressRegion": "Sector 1",
+              "postalCode": "013701",
+              "addressCountry": "RO"
+            }
+          },
+          {
+            "@type": "ArtSchool",
+            "@id": "https://atelierelascanteia.ro/",
+            "name": "Ateliere la Scânteia",
+            "parentOrganization": {
+              "@id": "https://atelierelascanteia.ro/#parentorg"
+            },
+            "url": "https://atelierelascanteia.ro",
+            "description": "Ateliere de artă și creativitate pentru copii",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Piața Presei Libere Nr. 1, Corp [Specifică]",
+              "addressLocality": "București",
+              "addressRegion": "Sector 1",
+              "postalCode": "013701",
+              "addressCountry": "RO"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 44.48,
+              "longitude": 26.0722
+            },
+            "knowsAbout": [
+              "Visual Arts",
+              "Children Education",
+              "Painting",
+              "Creative",
+              "Art "
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <!-- Elegant fonts: Serif for headings + Sans for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
