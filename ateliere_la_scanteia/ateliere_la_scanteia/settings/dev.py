@@ -1,3 +1,4 @@
+# dev.py
 from .base import *
 
 import os
@@ -6,9 +7,10 @@ import os
 DEBUG = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# (Dev-only is fine, but production should use env var DJANGO_SECRET_KEY / SECRET_KEY)
 SECRET_KEY = "django-insecure-3j+i9%qazy$4*l5n_5d8uy((vngexpqb&q7x3#d-rtg%pkjpvq"
 
-# SECURITY WARNING: define the correct hosts in production!
+# Dev: allow everything (ok locally)
 ALLOWED_HOSTS = ["*"]
 
 # ------------------------------------------------------------
@@ -46,6 +48,16 @@ MEMBRIE_APPLICATION_TO_EMAIL = os.getenv(
 # CORS (Frontend dev server)
 # ------------------------------------------------------------
 CORS_ALLOW_ALL_ORIGINS = True
+
+# ------------------------------------------------------------
+# DEV CSRF/COOKIE SETTINGS
+# ------------------------------------------------------------
+# In dev we keep these relaxed. Production safety is handled in base.py when DEBUG=False.
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
+# If you ever test admin over https locally (ngrok, etc.), you can add origins here:
+# CSRF_TRUSTED_ORIGINS = ["https://<your-dev-domain>"]
 
 # ------------------------------------------------------------
 # Optional local overrides
