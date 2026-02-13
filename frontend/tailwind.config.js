@@ -3,10 +3,6 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-
-    // ✅ Only scan Django templates in known folders (avoid ../**/ which can explode)
-    "../ateliere_la_scanteia/templates/**/*.html",
-    "../core/templates/**/*.html",
   ],
   theme: {
     extend: {
