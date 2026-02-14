@@ -52,15 +52,19 @@ function resolveMediaUrl(url) {
   // absolute URLs: keep
   if (/^https?:\/\//i.test(url)) return url;
 
-  // We must prefix media URLs with backend base in production
+  const u = String(url);
+
+  // ✅ Vite/React assets must stay on FRONTEND origin
+  // They are served by the frontend app, not Django.
+  if (u.startsWith("/assets/")) return u;
+
+  // ✅ Django media (or other backend paths) should be prefixed with backend base
   const base = (import.meta?.env?.VITE_API_BASE_URL || "").replace(/\/$/, "");
+  if (!base) return u.startsWith("/") ? u : `/${u}`;
 
-  // If no base, return as root-relative (local dev/proxy)
-  if (!base) return url.startsWith("/") ? url : `/${url}`;
-
-  // Always prefix root-relative paths (like /media/...) with backend base
-  return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
+  return `${base}${u.startsWith("/") ? "" : "/"}${u}`;
 }
+
 
 function normalizeImages(inputImages, fallbackSingle) {
   const arr = Array.isArray(inputImages) ? inputImages : [];
