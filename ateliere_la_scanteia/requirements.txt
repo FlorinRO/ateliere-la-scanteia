@@ -1,3 +1,4 @@
 Django>=6,<6.1
 wagtail==7.3rc1
 django-cors-headers
+psycopg[binary]>=3.1
