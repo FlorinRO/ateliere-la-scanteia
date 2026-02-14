@@ -56,7 +56,10 @@ function resolveMediaUrl(url) {
 
   // ✅ Vite assets (local images from src/assets)
   if (u.startsWith("/assets/")) {
-    const front = (import.meta?.env?.VITE_FRONTEND_ORIGIN || "").replace(/\/$/, "");
+    const front = (import.meta?.env?.VITE_FRONTEND_ORIGIN || "").replace(
+      /\/$/,
+      ""
+    );
     return front ? `${front}${u}` : u;
   }
 
@@ -69,15 +72,53 @@ function resolveMediaUrl(url) {
   return u;
 }
 
+function mediaDedupeKey(resolvedUrl) {
+  if (!resolvedUrl) return "";
+
+  const s = String(resolvedUrl).trim();
+
+  // remove query/hash
+  const noQ = s.split("#")[0].split("?")[0];
+
+  // take only filename
+  const parts = noQ.split("/");
+  const filename = (parts[parts.length - 1] || "").trim();
+  if (!filename) return noQ.replace(/\/$/, "");
+
+  // strip vite hash: name-<hash>.ext  => name.ext
+  // (hash usually 6+ chars, alnum)
+  const m = filename.match(/^(.+?)-[a-z0-9]{6,}(\.[a-z0-9]+)$/i);
+  const normalizedFilename = m ? `${m[1]}${m[2]}` : filename;
+
+  // key based on normalized filename (most stable), fallback to full path
+  return normalizedFilename.toLowerCase();
+}
+
+function dedupeByResolvedUrl(urls) {
+  const out = [];
+  const seen = new Set();
+
+  (Array.isArray(urls) ? urls : []).forEach((u) => {
+    const resolved = resolveMediaUrl(u);
+    if (!resolved) return;
+
+    const key = mediaDedupeKey(resolved);
+    if (key && seen.has(key)) return;
+
+    seen.add(key || String(resolved).trim().replace(/\/$/, ""));
+    out.push(resolved);
+  });
+
+  return out;
+}
 
 
 function normalizeImages(inputImages, fallbackSingle) {
   const arr = Array.isArray(inputImages) ? inputImages : [];
-  const normalized = arr
-    .map((x) => (typeof x === "string" ? x.trim() : ""))
-    .filter(Boolean)
-    .map(resolveMediaUrl)
-    .filter(Boolean);
+
+  const normalized = dedupeByResolvedUrl(
+    arr.map((x) => (typeof x === "string" ? x.trim() : "")).filter(Boolean)
+  );
 
   const single =
     typeof fallbackSingle === "string" && fallbackSingle
@@ -212,10 +253,18 @@ function withExtraImagesBySlug(article) {
   const baseImages = normalizeImages(article?.images, article?.image);
   const list = baseImages.slice();
 
+  const toKey = (u) => String(resolveMediaUrl(u) || "").trim().replace(/\/$/, "");
+
   const addIfMissing = (img) => {
     const resolved = resolveMediaUrl(img);
     if (!resolved) return;
-    if (!list.includes(resolved)) list.push(resolved);
+
+    // compare by normalized key, not by raw string
+    const key = toKey(resolved);
+    const existingKeys = new Set(list.map((x) => toKey(x)));
+    if (existingKeys.has(key)) return;
+
+    list.push(resolved);
   };
 
   if (slug === "spatiul-ca-mentor") {
@@ -224,10 +273,13 @@ function withExtraImagesBySlug(article) {
     addIfMissing(jurnalProfesorArte2);
   }
 
+  // ✅ FINAL DEDUPE (fix: “îmi arată 3 imagini dar am doar 2”)
+  const finalImages = dedupeByResolvedUrl(list.length ? list : baseImages);
+
   return {
     ...article,
-    images: list.length ? list : baseImages,
-    image: (list.length ? list : baseImages)?.[0] || article?.image || null,
+    images: finalImages,
+    image: finalImages?.[0] || article?.image || null,
   };
 }
 
@@ -467,7 +519,6 @@ function MediaCarousel({
         ? "opacity-100 scale-[1.03] translate-x-0 blur-0"
         : `opacity-0 scale-[1.2] ${from} blur-[0.9px]`,
     ].join(" ");
-    
 
     if (item?.type === "youtube" || item?.type === "vimeo") {
       return (
@@ -1438,7 +1489,9 @@ export function JurnalArticlePage() {
 
           <aside className="space-y-6">
             {/* BIG VIDEO CARD above CTA (desktop) */}
-            {hasVideos ? <ArticleVideoCard videos={patchedA?.videos} title="" /> : null}
+            {hasVideos ? (
+              <ArticleVideoCard videos={patchedA?.videos} title="" />
+            ) : null}
 
             <div className="rounded-[2.25rem] border border-ink-200/70 bg-white/55 p-7 shadow-[0_30px_90px_rgba(0,0,0,0.08)] backdrop-blur-[2px]">
               <p className="mt-6 text-[13px] leading-relaxed text-ink-600">
