@@ -142,12 +142,43 @@ WSGI_APPLICATION = "ateliere_la_scanteia.wsgi.application"
 # ------------------------------------------------------------
 # DATABASE
 # ------------------------------------------------------------
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+# Railway Postgres:
+# - When you add a Postgres DB in Railway, it provides DATABASE_URL
+# - If DATABASE_URL is present, we use it; otherwise we fall back to local SQLite.
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+
+if DATABASE_URL:
+    try:
+        import dj_database_url
+
+        DATABASES = {
+            "default": dj_database_url.parse(
+                DATABASE_URL,
+                conn_max_age=600,
+                ssl_require=True,
+            )
+        }
+    except Exception:
+        # Fallback (shouldn't happen in prod if dj-database-url is installed)
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": os.getenv("PGDATABASE", ""),
+                "USER": os.getenv("PGUSER", ""),
+                "PASSWORD": os.getenv("PGPASSWORD", ""),
+                "HOST": os.getenv("PGHOST", ""),
+                "PORT": os.getenv("PGPORT", "5432"),
+                "CONN_MAX_AGE": 600,
+                "OPTIONS": {"sslmode": "require"},
+            }
+        }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
 
 
 # ------------------------------------------------------------
