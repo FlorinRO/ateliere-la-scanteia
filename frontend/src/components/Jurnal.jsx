@@ -23,16 +23,25 @@ import jurnalProfesorArte2 from "../assets/jurnal-profesor-arte.jpeg";
  *  - list items can provide: image (string) and/or images (array of strings)
  *  - detail can provide: image (string) and/or images (array of strings)
  *
- * Video support:
+ * Video embeds:
  *  - list items can provide: video (string) and/or videos (array of strings)
  *  - detail can provide: video (string) and/or videos (array of strings)
  *
- * IMPORTANT (as requested):
- *  - If an article card has ANY video embeds -> card shows ONLY video (no images).
- *    Applies to homepage + "toate articolele".
- *  - Images remain visible inside the article page (hero/gallery), not on the card when video exists.
- *  - On article page: if videos exist -> show a separate VIDEO card ABOVE the CTA ("ÎNSCRIE-TE").
+ * NOTE:
+ *  - The big hero inside the article stays IMAGES ONLY.
+ *  - If an article has videos, the small cards (homepage + all articles) show ONLY video (no images).
+ *  - Inside the article page, videos are shown as a BIG separate card above the "ÎNSCRIE-TE" card.
  */
+
+// -------------------------
+// API helpers (fix production vs local)
+// -------------------------
+const API_BASE = (import.meta?.env?.VITE_API_BASE_URL || "").replace(/\/$/, "");
+
+function apiUrl(path) {
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return API_BASE ? `${API_BASE}${p}` : p;
+}
 
 // -------------------------
 // Helpers
@@ -41,6 +50,8 @@ function resolveMediaUrl(url) {
   if (!url) return null;
   if (/^https?:\/\//i.test(url)) return url;
 
+  // Important: when backend returns /media/..., we need to prefix with backend in prod
+  // Local dev can keep relative (proxy), but prod needs absolute.
   const base = (import.meta?.env?.VITE_API_BASE_URL || "").replace(/\/$/, "");
   if (!base) return url.startsWith("/") ? url : `/${url}`;
   return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
@@ -69,6 +80,19 @@ function safeStringList(input) {
   return arr
     .map((x) => (typeof x === "string" ? x.trim() : ""))
     .filter(Boolean);
+}
+
+function dedupeStrings(list) {
+  const out = [];
+  const seen = new Set();
+  (Array.isArray(list) ? list : []).forEach((x) => {
+    const v = typeof x === "string" ? x.trim() : "";
+    if (!v) return;
+    if (seen.has(v)) return;
+    seen.add(v);
+    out.push(v);
+  });
+  return out;
 }
 
 function parseYouTubeId(url) {
@@ -122,12 +146,11 @@ function isVideoFileUrl(url) {
   );
 }
 
-// Build VIDEO-only media items (youtube/vimeo/file)
-function normalizeVideoMediaItems(videosInput) {
-  const videos = safeStringList(videosInput);
+function normalizeVideoItems(videosInput) {
+  const rawList = dedupeStrings(safeStringList(videosInput));
   const items = [];
 
-  videos.forEach((raw) => {
+  rawList.forEach((raw) => {
     const url = resolveMediaUrl(raw) || raw;
 
     const yt = parseYouTubeId(url);
@@ -150,10 +173,21 @@ function normalizeVideoMediaItems(videosInput) {
 
     if (isVideoFileUrl(url)) {
       items.push({ type: "file", src: url, original: url });
+      return;
     }
   });
 
   return items;
+}
+
+function normalizeCardMediaItems(imagesInput, singleImage, videosInput) {
+  const videos = normalizeVideoItems(videosInput);
+
+  // Requirement: if there is video attached, show ONLY video on cards
+  if (videos.length) return videos;
+
+  const images = normalizeImages(imagesInput, singleImage);
+  return images.map((src) => ({ type: "image", src }));
 }
 
 // Inject requested 2nd images by slug (works even if API provides only one image)
@@ -210,7 +244,7 @@ const FALLBACK_ARTICLES = [
       "Materialele contează: de la tempera de supermarket la pigment profesionist",
     image: jurnal2,
     images: [jurnal2],
-    videos: [],
+    videos: ["https://www.youtube.com/watch?v=IYd1-cPwQCk&t=1s"],
     excerpt:
       "Diferența dintre „merge” și „se simte bine” vine adesea din material: densitate, granulație, lumină.",
     body: [
@@ -251,7 +285,7 @@ function normalizeListPayload(json) {
       const meta = typeof a?.meta === "string" ? a.meta : "";
 
       const images = normalizeImages(a?.images, a?.image);
-      const videos = safeStringList(a?.videos ?? a?.video);
+      const videos = dedupeStrings(safeStringList(a?.videos ?? a?.video));
 
       return withExtraImagesBySlug({
         slug,
@@ -445,9 +479,11 @@ function MediaCarousel({
             controls
             preload="metadata"
             playsInline
-            className={["h-full w-full object-cover", "bg-black", imgClassName].join(
-              " "
-            )}
+            className={[
+              "h-full w-full object-cover",
+              "bg-black",
+              imgClassName,
+            ].join(" ")}
           />
         </div>
       );
@@ -677,36 +713,53 @@ function FullscreenGallery({ open, images, startIndex = 0, alt, onClose }) {
   );
 }
 
-// Article video card (appears above CTA when article has video embeds)
-function ArticleVideoCard({ mediaItems, title = "VIDEO" }) {
-  const list = Array.isArray(mediaItems) ? mediaItems.filter(Boolean) : [];
-  if (!list.length) return null;
+// -------------------------
+// BIG video card (article page)
+// -------------------------
+function ArticleVideoCard({ videos, title = "Video" }) {
+  const mediaItems = useMemo(() => normalizeVideoItems(videos), [videos]);
+
+  if (!mediaItems.length) return null;
 
   return (
-    <section className="border-t border-ink-200/70 px-6 py-8 sm:px-10">
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <p className="text-[11px] tracking-[0.26em] text-ink-500">{title}</p>
-        <span className="h-px flex-1 bg-ink-200/70" />
+    <section
+      className={[
+        "overflow-hidden rounded-[2.25rem] border border-ink-200/70 bg-white/55",
+        "shadow-[0_30px_90px_rgba(0,0,0,0.10)] backdrop-blur-[2px]",
+      ].join(" ")}
+    >
+      <div className="flex items-center justify-between gap-4 border-b border-ink-200/70 px-6 py-5">
+        <div className="min-w-0">
+          <p className="text-[11px] tracking-[0.26em] text-ink-500">MEDIA</p>
+          <p className="mt-1 truncate text-[14px] font-medium text-ink-900">
+            {title}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-ink-200/70 bg-white/60 px-4 py-2 text-[11px] tracking-[0.22em] text-ink-700">
+          {mediaItems.length > 1 ? `${mediaItems.length} CLIPURI` : "1 CLIP"}
+        </div>
       </div>
 
-      <div className="group relative overflow-hidden rounded-[2rem] border border-ink-200/80 bg-white/60 shadow-[0_30px_90px_rgba(0,0,0,0.12)] backdrop-blur-[2px]">
+      <div className="relative">
         <MediaCarousel
-          mediaItems={list}
+          mediaItems={mediaItems}
           alt={title}
           autoplayMs={999999}
-          showArrows={list.length > 1}
-          showDots={list.length > 1}
+          showArrows={mediaItems.length > 1}
+          showDots={mediaItems.length > 1}
           pauseOnHover={true}
+          className="h-[420px] w-full sm:h-[520px] lg:h-[560px]"
+          imgClassName="h-full w-full object-cover"
           arrowsAlways={true}
-          // ✅ bigger
-          className="h-[340px] w-full sm:h-[520px]"
-          imgClassName="h-full w-full"
         />
       </div>
 
-      <p className="mt-5 text-[12px] italic leading-relaxed text-ink-600/90">
-        Dacă nu pornește automat, apasă play în video.
-      </p>
+      <div className="px-6 py-5">
+        <p className="text-[13px] leading-relaxed text-ink-600">
+          Dacă ai întrebări sau vrei să vezi un fragment din atmosferă / proces,
+          clipul de mai sus îți oferă context rapid.
+        </p>
+      </div>
     </section>
   );
 }
@@ -717,7 +770,7 @@ export default function Jurnal() {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch("/api/jurnal/", { signal: controller.signal })
+    fetch(apiUrl("/api/jurnal/"), { signal: controller.signal })
       .then(async (r) => {
         const data = await r.json().catch(() => null);
         if (!r.ok) throw new Error(`Failed to load jurnal list: ${r.status}`);
@@ -812,7 +865,7 @@ export function JurnalAllPage() {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch("/api/jurnal/", { signal: controller.signal })
+    fetch(apiUrl("/api/jurnal/"), { signal: controller.signal })
       .then(async (r) => {
         const data = await r.json().catch(() => null);
         if (!r.ok) throw new Error(`Failed to load jurnal list: ${r.status}`);
@@ -930,17 +983,16 @@ function ArticleCard({ a, to }) {
 
   const patched = withExtraImagesBySlug(a);
 
-  // IMPORTANT: if any videos exist -> card shows ONLY video (no images)
-  const rawVideos = patched?.videos ?? patched?.video;
-  const videoItems = normalizeVideoMediaItems(rawVideos);
-  const hasVideo = videoItems.length > 0;
+  // Cards must show ONLY video if it exists; otherwise images.
+  const cardMedia = normalizeCardMediaItems(
+    patched?.images,
+    patched?.image || jurnal1,
+    patched?.videos ?? patched?.video
+  );
 
-  const images = normalizeImages(patched?.images, patched?.image || jurnal1);
-  const safeImages = images.length ? images : [jurnal1];
-
-  const mediaForCard = hasVideo
-    ? videoItems
-    : safeImages.map((src) => ({ type: "image", src }));
+  const safeCardMedia = cardMedia.length
+    ? cardMedia
+    : [{ type: "image", src: jurnal1 }];
 
   return (
     <Link
@@ -962,18 +1014,21 @@ function ArticleCard({ a, to }) {
       <div className="relative">
         <div className="relative overflow-hidden">
           <MediaCarousel
-            mediaItems={mediaForCard}
+            mediaItems={safeCardMedia}
             alt={patched.title}
-            autoplayMs={hasVideo ? 999999 : 5000}
-            showArrows={true}
+            autoplayMs={safeCardMedia.some((x) => x?.type !== "image") ? 999999 : 5000}
+            showArrows={safeCardMedia.length > 1}
             showDots={false}
             className="h-[360px] w-full sm:h-[420px]"
             imgClassName={[
               "h-full w-full",
-              hasVideo
-                ? ""
-                : "transition-transform duration-[900ms] ease-out group-hover:scale-[1.12]",
+              "transition-transform duration-[900ms] ease-out",
+              // only zoom images, not videos
+              safeCardMedia.every((x) => x?.type === "image")
+                ? "group-hover:scale-[1.12]"
+                : "",
             ].join(" ")}
+            arrowsAlways={true}
           />
 
           <div
@@ -986,24 +1041,6 @@ function ArticleCard({ a, to }) {
           />
 
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-32 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
-
-          {hasVideo ? (
-            <div className="pointer-events-none absolute left-5 top-5 z-30">
-              <div
-                className={[
-                  "inline-flex items-center gap-2 rounded-full",
-                  "border border-white/25 bg-black/25 px-4 py-2",
-                  "text-[10px] tracking-[0.26em] text-white backdrop-blur",
-                  "shadow-[0_16px_55px_rgba(0,0,0,0.25)]",
-                ].join(" ")}
-              >
-                VIDEO
-                <span aria-hidden className="text-[14px] leading-none">
-                  ▶
-                </span>
-              </div>
-            </div>
-          ) : null}
         </div>
 
         <div className="relative z-20 px-7 pb-8 pt-6">
@@ -1070,13 +1107,15 @@ function ArticleBody({ a }) {
 
 export function JurnalArticlePage() {
   const { slug } = useParams();
-  const [article, setArticle] = useState(null);
-  const [status, setStatus] = useState("loading");
 
+  // IMPORTANT: hooks must not be conditional — define memo at top-level
   const fallbackArticle = useMemo(
     () => FALLBACK_ARTICLES.find((x) => x.slug === slug) || null,
     [slug]
   );
+
+  const [article, setArticle] = useState(null);
+  const [status, setStatus] = useState("loading");
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [headerIdx, setHeaderIdx] = useState(0);
@@ -1085,7 +1124,7 @@ export function JurnalArticlePage() {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch(`/api/jurnal/${slug}/`, { signal: controller.signal })
+    fetch(apiUrl(`/api/jurnal/${slug}/`), { signal: controller.signal })
       .then(async (r) => {
         const data = await r.json().catch(() => null);
 
@@ -1105,6 +1144,7 @@ export function JurnalArticlePage() {
         }
 
         const images = normalizeImages(d?.images, d?.image);
+        const videos = dedupeStrings(safeStringList(d?.videos ?? d?.video));
 
         const patched = withExtraImagesBySlug({
           slug: typeof d?.slug === "string" ? d.slug : slug,
@@ -1112,7 +1152,7 @@ export function JurnalArticlePage() {
           title: typeof d?.title === "string" ? d.title : "",
           image: images?.[0] || null,
           images,
-          videos: safeStringList(d?.videos ?? d?.video),
+          videos,
           excerpt: typeof d?.excerpt === "string" ? d.excerpt : "",
           meta: typeof d?.meta === "string" ? d.meta : "",
           body_html: typeof d?.body_html === "string" ? d.body_html : "",
@@ -1133,7 +1173,6 @@ export function JurnalArticlePage() {
 
   const a = article || fallbackArticle;
 
-  // NOTE: no hooks below this line (fixes "hook called conditionally" lint)
   if (status === "not_found" && !fallbackArticle) {
     return (
       <section className="relative bg-[#F6F1E7] py-16 sm:py-20">
@@ -1158,18 +1197,12 @@ export function JurnalArticlePage() {
 
   const patchedA = withExtraImagesBySlug(a);
 
-  // Hero stays IMAGES ONLY (as requested)
+  // IMPORTANT: hero stays images only (as requested)
   const headerImages = normalizeImages(
     patchedA?.images,
     patchedA?.image || jurnal1
   );
   const safeHeaderImages = headerImages.length ? headerImages : [jurnal1];
-
-  // Article page: separate VIDEO card above CTA (if videos exist)
-  const articleVideoItems = normalizeVideoMediaItems(
-    patchedA?.videos ?? patchedA?.video
-  );
-  const hasArticleVideos = articleVideoItems.length > 0;
 
   const openLightbox = () => {
     setLightboxStart(headerIdx || 0);
@@ -1184,13 +1217,14 @@ export function JurnalArticlePage() {
     .filter(Boolean)
     .join(" · ");
 
+  const hasVideos = dedupeStrings(safeStringList(patchedA?.videos)).length > 0;
+
   return (
     <article className="relative overflow-hidden bg-[#F6F1E7] pb-12 pt-24 sm:pb-16 sm:pt-28">
       <div className="mx-auto max-w-7xl px-0 sm:px-6">
-        {/* TOP BAR like example: left details + centered-ish pills */}
+        {/* TOP BAR */}
         <div className="mt-6 px-6 sm:px-0">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            {/* LEFT DETAILS */}
             <div className="min-w-[220px]">
               <p className="text-xs tracking-[0.28em] text-accent-700">
                 {topLabel}
@@ -1202,7 +1236,6 @@ export function JurnalArticlePage() {
               ) : null}
             </div>
 
-            {/* BUTTONS */}
             <div className="flex flex-wrap items-center gap-4">
               <Link
                 to="/jurnal"
@@ -1214,7 +1247,6 @@ export function JurnalArticlePage() {
                   "transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-700/45 hover:bg-white/85 hover:shadow-[0_18px_50px_rgba(0,0,0,0.10)]",
                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-700 focus-visible:ring-offset-4 focus-visible:ring-offset-[#F6F1E7]",
                 ].join(" ")}
-                aria-label="Vezi toate articolele"
               >
                 ← VEZI TOATE ARTICOLELE
                 <span className="h-px w-12 bg-ink-300/70" />
@@ -1238,7 +1270,7 @@ export function JurnalArticlePage() {
           </div>
         </div>
 
-        {/* HERO (click -> fullscreen) */}
+        {/* HERO (images only) */}
         <header className="mt-6 overflow-hidden rounded-none border-y border-ink-200/70 bg-white/60 shadow-[0_60px_160px_rgba(0,0,0,0.16)] backdrop-blur-[2px] sm:mt-8 sm:rounded-[2.75rem] sm:border sm:mx-0">
           <button
             type="button"
@@ -1297,7 +1329,6 @@ export function JurnalArticlePage() {
           </button>
         </header>
 
-        {/* FULLSCREEN MODAL WITH NAV ARROWS */}
         <FullscreenGallery
           open={lightboxOpen}
           images={safeHeaderImages}
@@ -1306,11 +1337,10 @@ export function JurnalArticlePage() {
           onClose={() => setLightboxOpen(false)}
         />
 
-        {/* MOBILE: merged stack */}
+        {/* MOBILE */}
         <div className="mt-0 lg:hidden">
           <div className="overflow-hidden rounded-none border-y border-ink-200/70 bg-white/55 shadow-[0_30px_90px_rgba(0,0,0,0.08)] backdrop-blur-[2px] sm:mt-10 sm:rounded-[2.25rem] sm:border">
             <section className="px-6 pb-10 pt-8 sm:px-10 sm:pt-10">
-              <p className="sr-only">Conținut articol</p>
               <ArticleBody a={patchedA} />
               <div className="mt-10 flex items-center justify-center gap-3">
                 <span className="h-px w-10 bg-ink-200/80" />
@@ -1321,9 +1351,14 @@ export function JurnalArticlePage() {
               </div>
             </section>
 
-            {/* VIDEO card ABOVE CTA */}
-            {hasArticleVideos ? (
-              <ArticleVideoCard mediaItems={articleVideoItems} title="VIDEO" />
+            {/* BIG VIDEO CARD above CTA */}
+            {hasVideos ? (
+              <section className="border-t border-ink-200/70 px-6 py-8 sm:px-10">
+                <ArticleVideoCard
+                  videos={patchedA?.videos}
+                  title="Video din articol"
+                />
+              </section>
             ) : null}
 
             <section className="border-t border-ink-200/70 px-6 py-8 sm:px-10">
@@ -1361,7 +1396,6 @@ export function JurnalArticlePage() {
         {/* DESKTOP */}
         <div className="mt-10 hidden gap-10 lg:grid lg:grid-cols-[1fr_320px] lg:gap-12">
           <section className="rounded-[2.25rem] border border-ink-200/70 bg-white/55 p-10 shadow-[0_30px_90px_rgba(0,0,0,0.08)] backdrop-blur-[2px]">
-            <p className="sr-only">Conținut articol</p>
             <ArticleBody a={patchedA} />
 
             <div className="mt-10 flex items-center justify-center gap-3">
@@ -1390,29 +1424,12 @@ export function JurnalArticlePage() {
           </section>
 
           <aside className="space-y-6">
-            {/* VIDEO card ABOVE CTA */}
-            {hasArticleVideos ? (
-              <div className="rounded-[2.25rem] border border-ink-200/70 bg-white/55 p-7 shadow-[0_30px_90px_rgba(0,0,0,0.08)] backdrop-blur-[2px]">
-                <p className="text-[11px] tracking-[0.26em] text-ink-500">
-                  VIDEO
-                </p>
-                <div className="mt-5 overflow-hidden rounded-[1.75rem] border border-ink-200/70 bg-white/60">
-                
-                <MediaCarousel
-                  mediaItems={articleVideoItems}
-                  alt="Video"
-                  autoplayMs={999999}
-                  showArrows={articleVideoItems.length > 1}
-                  showDots={articleVideoItems.length > 1}
-                  pauseOnHover={true}
-                  arrowsAlways={true}
-                  // ✅ bigger in sidebar
-                  className="h-[320px] w-full"
-                  imgClassName="h-full w-full"
-                />
-
-                </div>
-              </div>
+            {/* BIG VIDEO CARD above CTA (desktop) */}
+            {hasVideos ? (
+              <ArticleVideoCard
+                videos={patchedA?.videos}
+                title="Video din articol"
+              />
             ) : null}
 
             <div className="rounded-[2.25rem] border border-ink-200/70 bg-white/55 p-7 shadow-[0_30px_90px_rgba(0,0,0,0.08)] backdrop-blur-[2px]">
