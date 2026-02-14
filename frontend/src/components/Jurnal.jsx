@@ -186,9 +186,9 @@ function normalizeVideoItems(videosInput) {
 }
 
 function normalizeCardMediaItems(imagesInput, singleImage, videosInput) {
+  // ✅ Requirement: if there is video attached, show ONLY video on cards.
+  // ✅ IMPORTANT: [] is truthy, so always check length, not existence.
   const videos = normalizeVideoItems(videosInput);
-
-  // Requirement: if there is video attached, show ONLY video on cards
   if (videos.length) return videos;
 
   const images = normalizeImages(imagesInput, singleImage);
@@ -484,11 +484,9 @@ function MediaCarousel({
             controls
             preload="metadata"
             playsInline
-            className={[
-              "h-full w-full object-cover",
-              "bg-black",
-              imgClassName,
-            ].join(" ")}
+            className={["h-full w-full object-cover", "bg-black", imgClassName].join(
+              " "
+            )}
           />
         </div>
       );
@@ -999,6 +997,9 @@ function ArticleCard({ a, to }) {
     ? cardMedia
     : [{ type: "image", src: jurnal1 }];
 
+  const hasAnyVideoOnCard = safeCardMedia.some((x) => x?.type !== "image");
+  const allImagesOnCard = safeCardMedia.every((x) => x?.type === "image");
+
   return (
     <Link
       ref={cardRef}
@@ -1021,7 +1022,7 @@ function ArticleCard({ a, to }) {
           <MediaCarousel
             mediaItems={safeCardMedia}
             alt={patched.title}
-            autoplayMs={safeCardMedia.some((x) => x?.type !== "image") ? 999999 : 5000}
+            autoplayMs={hasAnyVideoOnCard ? 999999 : 5000}
             showArrows={safeCardMedia.length > 1}
             showDots={false}
             className="h-[360px] w-full sm:h-[420px]"
@@ -1029,9 +1030,7 @@ function ArticleCard({ a, to }) {
               "h-full w-full",
               "transition-transform duration-[900ms] ease-out",
               // only zoom images, not videos
-              safeCardMedia.every((x) => x?.type === "image")
-                ? "group-hover:scale-[1.12]"
-                : "",
+              allImagesOnCard ? "group-hover:scale-[1.12]" : "",
             ].join(" ")}
             arrowsAlways={true}
           />
@@ -1222,6 +1221,7 @@ export function JurnalArticlePage() {
     .filter(Boolean)
     .join(" · ");
 
+  // ✅ IMPORTANT: check LENGTH (not truthy of [])
   const hasVideos = dedupeStrings(safeStringList(patchedA?.videos)).length > 0;
 
   return (
@@ -1359,10 +1359,7 @@ export function JurnalArticlePage() {
             {/* BIG VIDEO CARD above CTA */}
             {hasVideos ? (
               <section className="border-t border-ink-200/70 px-6 py-8 sm:px-10">
-                <ArticleVideoCard
-                  videos={patchedA?.videos}
-                  title="Video din articol"
-                />
+                <ArticleVideoCard videos={patchedA?.videos} title="" />
               </section>
             ) : null}
 
@@ -1430,12 +1427,7 @@ export function JurnalArticlePage() {
 
           <aside className="space-y-6">
             {/* BIG VIDEO CARD above CTA (desktop) */}
-            {hasVideos ? (
-              <ArticleVideoCard
-                videos={patchedA?.videos}
-                title="Video din articol"
-              />
-            ) : null}
+            {hasVideos ? <ArticleVideoCard videos={patchedA?.videos} title="" /> : null}
 
             <div className="rounded-[2.25rem] border border-ink-200/70 bg-white/55 p-7 shadow-[0_30px_90px_rgba(0,0,0,0.08)] backdrop-blur-[2px]">
               <p className="mt-6 text-[13px] leading-relaxed text-ink-600">
