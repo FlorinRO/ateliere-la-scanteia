@@ -13,24 +13,44 @@ function ScrollToHash() {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
+    // No hash => go top instantly
     if (!hash) {
       window.scrollTo({ top: 0, behavior: "auto" });
       return;
     }
 
     const id = hash.slice(1);
+    const NAV_OFFSET = 110;
 
-    const t = setTimeout(() => {
+    let raf = 0;
+    let tries = 0;
+    const MAX_TRIES = 24;
+
+    const go = () => {
       const el = document.getElementById(id);
-      if (!el) return;
 
-      const NAV_OFFSET = 110;
+      // If we navigated and sections aren't mounted yet, retry shortly.
+      if (!el) {
+        tries += 1;
+        if (tries <= MAX_TRIES) {
+          raf = requestAnimationFrame(go);
+        }
+        return;
+      }
+
       const y = el.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
-
       window.scrollTo({ top: y, behavior: "smooth" });
+    };
+
+    // Let the route paint first
+    const t = setTimeout(() => {
+      raf = requestAnimationFrame(go);
     }, 0);
 
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      cancelAnimationFrame(raf);
+    };
   }, [pathname, hash]);
 
   return null;
@@ -86,16 +106,26 @@ export default function App() {
     const html = document.documentElement;
     const body = document.body;
 
+    // Reset any bad leftovers
     html.style.overflow = "";
     body.style.overflow = "";
     body.style.position = "";
     body.style.top = "";
     body.style.width = "";
 
+    // Keep vertical scroll working
     html.style.overflowX = "hidden";
     html.style.overflowY = "auto";
     body.style.overflowX = "hidden";
     body.style.overflowY = "auto";
+
+    // Extra safety: avoid “scroll lock” from other libs/components
+    const prevOverscroll = html.style.overscrollBehavior;
+    html.style.overscrollBehavior = "auto";
+
+    return () => {
+      html.style.overscrollBehavior = prevOverscroll || "";
+    };
   }, []);
 
   return (

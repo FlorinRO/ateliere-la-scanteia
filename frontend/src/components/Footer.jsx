@@ -44,7 +44,6 @@ export default function Footer() {
 
       <div className="relative mx-auto w-full max-w-6xl px-6 py-16 pt-14">
         <div className="grid gap-12 md:grid-cols-4">
-
           {/* Brand with Logo ONLY */}
           <div>
             <img
@@ -65,22 +64,38 @@ export default function Footer() {
             </h4>
             <ul className="mt-5 space-y-3 text-sm text-stone-700">
               <li>
-                <Link to="/#spatiul" onClick={onHashNav("spatiul")} className="hover:text-stone-900">
+                <Link
+                  to="/#spatiul"
+                  onClick={onHashNav("spatiul")}
+                  className="hover:text-stone-900"
+                >
                   Spațiul
                 </Link>
               </li>
               <li>
-                <Link to="/#manifest" onClick={onHashNav("manifest")} className="hover:text-stone-900">
+                <Link
+                  to="/#manifest"
+                  onClick={onHashNav("manifest")}
+                  className="hover:text-stone-900"
+                >
                   Manifest
                 </Link>
               </li>
               <li>
-                <Link to="/#jurnal" onClick={onHashNav("jurnal")} className="hover:text-stone-900">
+                <Link
+                  to="/#jurnal"
+                  onClick={onHashNav("jurnal")}
+                  className="hover:text-stone-900"
+                >
                   Jurnal
                 </Link>
               </li>
               <li>
-                <Link to="/#testimoniale" onClick={onHashNav("testimoniale")} className="hover:text-stone-900">
+                <Link
+                  to="/#testimoniale"
+                  onClick={onHashNav("testimoniale")}
+                  className="hover:text-stone-900"
+                >
                   Testimoniale
                 </Link>
               </li>
@@ -93,7 +108,8 @@ export default function Footer() {
               Aplicație
             </h4>
             <p className="mt-4 text-sm text-stone-600">
-              Procesul de selecție este deschis pentru un număr limitat de locuri.
+              Procesul de selecție este deschis pentru un număr limitat de
+              locuri.
             </p>
 
             <div className="mt-6">
@@ -133,14 +149,8 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-16 grid gap-4 border-t border-black/10 pt-6 text-xs text-stone-500 md:grid-cols-3 md:items-center">
-          <div className="flex justify-center md:justify-start">
-            <a
-              href="/admin/"
-              className="rounded-full border border-black/10 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-stone-500 transition-all duration-300 hover:border-black/20 hover:text-stone-800"
-            >
-              Admin
-            </a>
-          </div>
+          {/* ✅ Removed Admin button (client will type /admin manually) */}
+          <div className="hidden md:block" />
 
           <p className="text-center">
             © {year} Ateliere la Scânteia. Toate drepturile rezervate.

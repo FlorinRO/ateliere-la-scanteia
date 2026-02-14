@@ -1,9 +1,16 @@
+# models.py
 from django.db import models
 
+from modelcluster.fields import ParentalKey
+from wagtail import blocks
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
-from wagtail.models import Page
-from wagtail.fields import RichTextField
+from wagtail.admin.panels import (
+    FieldPanel,
+    MultiFieldPanel,
+    InlinePanel,
+)
+from wagtail.fields import RichTextField, StreamField
+from wagtail.models import Page, Orderable
 
 
 @register_setting
@@ -42,7 +49,6 @@ class MainPageContent(BaseSiteSetting):
     spatiul_label = models.CharField(max_length=255, blank=True, default="( SPAȚIUL )")
     spatiul_title = models.CharField(max_length=255, blank=True, default="Suntem într-un monument.")
 
-    # ✅ (1) Editorial paragraph (as-is, Damian edits it)
     spatiul_paragraph = models.TextField(
         blank=True,
         default=(
@@ -51,14 +57,12 @@ class MainPageContent(BaseSiteSetting):
         ),
     )
 
-    # ✅ (2) NEW: SEO blurb (short, different from editorial, Damian edits it)
     spatiul_seo_blurb = models.TextField(
         blank=True,
         default="",
         help_text="Text scurt (1–2 fraze) pentru context SEO/geo. Recomandat să NU repete paragraful editorial.",
     )
 
-    # ✅ (3) NEW: Optional hidden keywords (sr-only in frontend)
     spatiul_hidden_keywords = models.TextField(
         blank=True,
         default="",
@@ -235,11 +239,8 @@ class MainPageContent(BaseSiteSetting):
                 FieldPanel("spatiul_label"),
                 FieldPanel("spatiul_title"),
                 FieldPanel("spatiul_paragraph"),
-
-                # ✅ NEW fields exposed to Damian
                 FieldPanel("spatiul_seo_blurb"),
                 FieldPanel("spatiul_hidden_keywords"),
-
                 FieldPanel("spatiul_image_1"),
                 FieldPanel("spatiul_quote"),
                 FieldPanel("spatiul_stat_1_value"),
@@ -342,9 +343,15 @@ class JurnalIndexPage(Page):
 class JurnalArticlePage(Page):
     """
     Individual jurnal article page.
+
+    NEW:
+      - gallery_images (multiple images)
+      - videos (multiple URL embeds)
     """
     category = models.CharField(max_length=60, blank=True, default="FILOSOFIE")
     excerpt = models.TextField(blank=True, default="")
+
+    # Hero stays the primary "image"
     hero_image = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
@@ -352,15 +359,68 @@ class JurnalArticlePage(Page):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+
     meta = models.CharField(max_length=80, blank=True, default="6 min · Atelier")
     body = RichTextField(blank=True, features=["h2", "h3", "bold", "italic", "ol", "ul", "link"])
+
+    # ✅ Multiple video embed links (YouTube/Vimeo/MP4 etc.)
+    videos = StreamField(
+        [
+            ("video", blocks.URLBlock(required=True, help_text="YouTube/Vimeo/mp4 link")),
+        ],
+        blank=True,
+        use_json_field=True,
+    )
 
     content_panels = Page.content_panels + [
         FieldPanel("category"),
         FieldPanel("meta"),
         FieldPanel("excerpt"),
         FieldPanel("hero_image"),
+
+        # ✅ Gallery images
+        MultiFieldPanel(
+            [
+                InlinePanel("gallery_images", label="Imagini galerie"),
+            ],
+            heading="Galerie imagini (pentru slider / carduri)",
+        ),
+
+        # ✅ Videos
+        MultiFieldPanel(
+            [
+                FieldPanel("videos"),
+            ],
+            heading="Video-uri (embed links)",
+        ),
+
         FieldPanel("body"),
     ]
 
     parent_page_types = ["core.JurnalIndexPage"]
+
+
+class JurnalArticleGalleryImage(Orderable):
+    """
+    Sortable gallery images for an article page.
+    """
+    page = ParentalKey(
+        "core.JurnalArticlePage",
+        related_name="gallery_images",
+        on_delete=models.CASCADE,
+    )
+
+    image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name="+",
+    )
+
+    caption = models.CharField(max_length=140, blank=True, default="")
+
+    panels = [
+        FieldPanel("image"),
+        FieldPanel("caption"),
+    ]

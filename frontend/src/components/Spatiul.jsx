@@ -90,6 +90,43 @@ function useScrollProgress(ref, scrollEl) {
   return p;
 }
 
+/**
+ * ✅ Delayed reveal that RE-RUNS, without setState sync inside effect body
+ * - when === true  -> start timer -> setOn(true)
+ * - when === false -> cleanup will reset (setOn(false)) + cancel timer, so next time it re-animates
+ */
+function useDelayedReveal(when, delayMs = 180) {
+  const [on, setOn] = useState(false);
+
+  useEffect(() => {
+    let t = null;
+    let cancelled = false;
+
+    if (when) {
+      // show with delay
+      t = setTimeout(() => {
+        if (cancelled) return;
+        setOn(true);
+      }, delayMs);
+    }
+
+    // IMPORTANT: reset in cleanup (runs when `when` changes or unmount)
+    return () => {
+      cancelled = true;
+      if (t) clearTimeout(t);
+
+      // reset only when leaving the trigger (so we can re-run next time)
+      if (!when) return;
+
+      // `when` was true for this effect instance, so leaving it means next render has when=false.
+      // Reset is deferred via rAF to avoid "sync setState in effect" lint rule.
+      requestAnimationFrame(() => setOn(false));
+    };
+  }, [when, delayMs]);
+
+  return on;
+}
+
 export default function Spatiul({ scrollEl }) {
   const [hover1, setHover1] = useState(false);
   const [hover2, setHover2] = useState(false);
@@ -110,6 +147,13 @@ export default function Spatiul({ scrollEl }) {
     observerRoot
   );
   const filoP = useScrollProgress(filoWrapRef, scrollEl);
+
+  // ✅ Trigger zones (tweak if you want earlier/later)
+  const spQuoteTrigger = imgIn && spP > 0.38;
+  const fiQuoteTrigger = filoImgIn && filoP > 0.52;
+
+  const spQuoteOn = useDelayedReveal(spQuoteTrigger, 180);
+  const fiQuoteOn = useDelayedReveal(fiQuoteTrigger, 220);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -157,10 +201,8 @@ export default function Spatiul({ scrollEl }) {
               "Tavane înalte, lumină naturală de nord și o atmosferă care impune",
               "respect pentru actul artistic. Spațiul nu e decor — este mentor.",
             ],
-        // ✅ NEW: fully editable from Wagtail
         seoBlurbLines: splitLines(sp.seo_blurb),
         hiddenKeywordsRaw: (sp.hidden_keywords || "").trim(),
-
         image: spImage,
         quote: (
           sp.quote ||
@@ -202,13 +244,15 @@ export default function Spatiul({ scrollEl }) {
 
   const FRAME = "border border-[#6b1f2a]"; // 1px visiniu
 
-  const MINI_CARD = [
+  const MINI_CARD_BASE = [
     "rounded-2xl",
     "bg-white/95",
     "backdrop-blur-sm",
     "shadow-[0_18px_60px_rgba(0,0,0,0.14)]",
     "ring-1 ring-black/5",
     "max-w-full overflow-hidden",
+    "will-change-transform",
+    "transition-[opacity,transform,filter] duration-[820ms] ease-out",
   ].join(" ");
 
   const MINI_TEXT = [
@@ -301,7 +345,15 @@ export default function Spatiul({ scrollEl }) {
                 </div>
 
                 <div className="absolute bottom-7 left-7 right-7 sm:right-auto sm:w-[460px]">
-                  <div className={MINI_CARD}>
+                  <div
+                    className={[
+                      MINI_CARD_BASE,
+                      spQuoteOn
+                        ? "opacity-100 translate-y-0 blur-0"
+                        : "opacity-0 translate-y-3 blur-[2px]",
+                    ].join(" ")}
+                    style={{ transitionDelay: spQuoteOn ? "120ms" : "0ms" }}
+                  >
                     <div className="p-5">
                       <p className={MINI_TEXT}>{content.spatiul.quote}</p>
                       <div className="mt-4 h-[1px] w-12 bg-accent-600/70" />
@@ -328,11 +380,13 @@ export default function Spatiul({ scrollEl }) {
                 {content.spatiul.title}
               </h2>
 
-              {/* ✅ SEO blurb (editable in Wagtail) */}
               {!!content.spatiul.seoBlurbLines.length && (
                 <p className="mt-4 max-w-prose text-[13px] leading-relaxed text-ink-600">
                   {content.spatiul.seoBlurbLines.map((line, idx) => (
-                    <span key={idx} className={idx === 0 ? "block" : "mt-1 block"}>
+                    <span
+                      key={idx}
+                      className={idx === 0 ? "block" : "mt-1 block"}
+                    >
                       {line}
                     </span>
                   ))}
@@ -348,35 +402,20 @@ export default function Spatiul({ scrollEl }) {
               </p>
 
               <div className="mt-10 grid grid-cols-3 gap-6">
-                <div>
-                  <div className="text-3xl font-semibold text-ink-900">
-                    {content.spatiul.stats[0].value}
+                {content.spatiul.stats.map((s, i) => (
+                  <div key={i}>
+                    <div className="text-3xl font-semibold text-ink-900">
+                      {s.value}
+                    </div>
+                    <div className="mt-1 text-[11px] tracking-[0.22em] text-ink-500">
+                      {s.label}
+                    </div>
                   </div>
-                  <div className="mt-1 text-[11px] tracking-[0.22em] text-ink-500">
-                    {content.spatiul.stats[0].label}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-3xl font-semibold text-ink-900">
-                    {content.spatiul.stats[1].value}
-                  </div>
-                  <div className="mt-1 text-[11px] tracking-[0.22em] text-ink-500">
-                    {content.spatiul.stats[1].label}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-3xl font-semibold text-ink-900">
-                    {content.spatiul.stats[2].value}
-                  </div>
-                  <div className="mt-1 text-[11px] tracking-[0.22em] text-ink-500">
-                    {content.spatiul.stats[2].label}
-                  </div>
-                </div>
+                ))}
               </div>
 
               <div className="mt-10 h-[1px] w-20 bg-ink-300/70" />
 
-              {/* ✅ Optional hidden keywords (editable in Wagtail) */}
               {!!content.spatiul.hiddenKeywordsRaw && (
                 <p className="sr-only">{content.spatiul.hiddenKeywordsRaw}</p>
               )}
@@ -447,7 +486,15 @@ export default function Spatiul({ scrollEl }) {
                 </div>
 
                 <div className="absolute bottom-6 left-6 right-6 sm:right-auto sm:max-w-[420px]">
-                  <div className={MINI_CARD}>
+                  <div
+                    className={[
+                      MINI_CARD_BASE,
+                      fiQuoteOn
+                        ? "opacity-100 translate-y-0 blur-0"
+                        : "opacity-0 translate-y-3 blur-[2px]",
+                    ].join(" ")}
+                    style={{ transitionDelay: fiQuoteOn ? "140ms" : "0ms" }}
+                  >
                     <div className="p-6">
                       <p className={MINI_TEXT}>{content.filosofie.quote}</p>
                       <div className="mt-4 h-[1px] w-14 bg-accent-600/70" />
@@ -487,14 +534,20 @@ export default function Spatiul({ scrollEl }) {
               <div className="mt-10 space-y-6 text-[15px] leading-relaxed text-ink-700">
                 <p>
                   {content.filosofie.p1Lines.map((line, idx) => (
-                    <span key={idx} className={idx === 0 ? "block" : "mt-1 block"}>
+                    <span
+                      key={idx}
+                      className={idx === 0 ? "block" : "mt-1 block"}
+                    >
                       {line}
                     </span>
                   ))}
                 </p>
                 <p>
                   {content.filosofie.p2Lines.map((line, idx) => (
-                    <span key={idx} className={idx === 0 ? "block" : "mt-1 block"}>
+                    <span
+                      key={idx}
+                      className={idx === 0 ? "block" : "mt-1 block"}
+                    >
                       {line}
                     </span>
                   ))}
@@ -505,11 +558,20 @@ export default function Spatiul({ scrollEl }) {
                 <button
                   type="button"
                   onClick={goToMembrie}
-                  className="text-xs tracking-[0.22em] text-ink-700 hover:text-ink-900 transition-colors"
+                  className={[
+                    "group relative inline-flex items-center gap-4",
+                    "text-xs tracking-[0.22em]",
+                    "text-ink-700 hover:text-ink-900 transition-colors",
+                  ].join(" ")}
+                  aria-label={content.filosofie.cta}
                 >
-                  {content.filosofie.cta}
+                  <span className="pointer-events-none absolute -inset-x-3 -inset-y-2 -z-10 rounded-xl bg-accent-600/0 blur-md transition-all duration-300 group-hover:bg-accent-600/15" />
+                  <span>{content.filosofie.cta}</span>
+                  <span className="h-[1px] w-16 bg-accent-600/70 transition-all duration-300 group-hover:w-20 group-hover:bg-accent-600" />
+                  <span className="text-ink-500 transition-transform duration-300 group-hover:translate-x-0.5">
+                    →
+                  </span>
                 </button>
-                <span className="h-[1px] w-16 bg-accent-600" />
               </div>
 
               <div

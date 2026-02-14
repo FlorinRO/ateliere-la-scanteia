@@ -1,0 +1,1540 @@
+[
+{
+  "model": "wagtailcore.locale",
+  "pk": 1,
+  "fields": {
+    "language_code": "en"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 1,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-11T14:24:56.085Z",
+    "uuid": "b9b08f97-3cf1-44ea-9301-181ca3454bb8",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 2,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-11T15:38:09.014Z",
+    "uuid": "eedf3cb3-8f45-499f-b763-045e74cffb00",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": false,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 3,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-11T15:41:22.614Z",
+    "uuid": "1ea834b2-1398-4129-8ed3-4528bc638bcf",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": false,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 4,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:00:02.740Z",
+    "uuid": "4e8efee6-d704-4c16-a574-927c9d5b3f2f",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 5,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:01:22.827Z",
+    "uuid": "fa63284c-6d65-4844-a697-f9e0dbc877d9",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 6,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:01:43.779Z",
+    "uuid": "8ed7e275-d069-40a0-9c52-382d6670e018",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 7,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:01:44.514Z",
+    "uuid": "e643364d-6253-4415-981d-f11cfcf52fe2",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": false,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 8,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:04:52.452Z",
+    "uuid": "ea21394f-c486-4d64-ac03-3a5ff501633f",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 9,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:05:01.579Z",
+    "uuid": "b493cd60-3cb4-4713-af07-1fa84a315073",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": false,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 10,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:06:02.223Z",
+    "uuid": "8aa8baa1-3779-4aa9-b992-bea11c6a08d2",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 11,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:14:15.682Z",
+    "uuid": "60e62302-e536-4f6b-9da3-add99600533d",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 12,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:17:50.506Z",
+    "uuid": "a52a3d82-baf3-44b0-ac18-c8b9fef1ca93",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 13,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:20:22.177Z",
+    "uuid": "3aa13053-63aa-4b36-bdcf-f5e0cb729a40",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 14,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:20:39.387Z",
+    "uuid": "498ac099-69da-4db7-8283-2a4fc9d65ace",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 15,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:20:52.522Z",
+    "uuid": "a527f98a-4603-4dee-bdec-ff293cbc8984",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 16,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:21:01.708Z",
+    "uuid": "f394ccdf-7ff9-49a6-9908-b30e8b665da7",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 17,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T10:21:15.417Z",
+    "uuid": "801392c5-48e2-4ba9-bf30-6f911299be75",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 18,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T11:21:22.174Z",
+    "uuid": "b6d6d7a0-7a6a-4640-bc8b-ea30a8142d2d",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 19,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-12T11:21:35.194Z",
+    "uuid": "920de283-acc0-4a62-85f1-52d08212ea31",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 20,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-13T12:24:54.682Z",
+    "uuid": "11364105-438d-4e94-bd22-b43691c6c7a7",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 21,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-13T14:20:00.461Z",
+    "uuid": "4dac9ecf-1b6d-4773-a9cc-f8075249e374",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 22,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-13T14:25:23.700Z",
+    "uuid": "5a2aeb79-378b-45ff-b9d3-c5084d2b9d86",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 23,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-13T14:31:02.314Z",
+    "uuid": "41f6908a-8276-4edf-946a-d1ede3eefe5e",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 24,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-13T14:31:34.372Z",
+    "uuid": "0550faaa-93d4-4053-af3c-dcec01d01c06",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.modellogentry",
+  "pk": 25,
+  "fields": {
+    "content_type": [
+      "core",
+      "mainpagecontent"
+    ],
+    "label": "main page content for localhost [default]",
+    "action": "wagtail.edit",
+    "data": {},
+    "timestamp": "2026-02-13T14:32:53.603Z",
+    "uuid": "c151320f-b0bd-4ffb-9883-f75db6ade24c",
+    "user": [
+      "florin"
+    ],
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "object_id": "1"
+  }
+},
+{
+  "model": "wagtailcore.revision",
+  "pk": 1,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalindexpage"
+    ],
+    "base_content_type": [
+      "wagtailcore",
+      "page"
+    ],
+    "object_id": "4",
+    "created_at": "2026-02-12T11:43:38.199Z",
+    "user": null,
+    "object_str": "Jurnal",
+    "content": {
+      "pk": 4,
+      "path": "000100010001",
+      "depth": 3,
+      "numchild": 0,
+      "translation_key": "3905ee52-9574-495e-9d3f-73652755ede9",
+      "locale": 1,
+      "latest_revision": null,
+      "live": true,
+      "has_unpublished_changes": false,
+      "first_published_at": null,
+      "last_published_at": null,
+      "live_revision": null,
+      "go_live_at": null,
+      "expire_at": null,
+      "expired": false,
+      "locked": false,
+      "locked_at": null,
+      "locked_by": null,
+      "title": "Jurnal",
+      "draft_title": "Jurnal",
+      "slug": "jurnal",
+      "content_type": 49,
+      "url_path": "/home/jurnal/",
+      "owner": null,
+      "seo_title": "",
+      "show_in_menus": false,
+      "search_description": "",
+      "latest_revision_created_at": null,
+      "alias_of": null,
+      "label": "( ARHIVA SCÂNTEIA )",
+      "subtitle": "— note despre artă",
+      "intro": "- Gânduri scurte, blânde și practice despre procesul creativ al copiilor: materiale, spațiu, curaj și bucuria de a încerca.",
+      "wagtail_admin_comments": []
+    },
+    "approved_go_live_at": null
+  }
+},
+{
+  "model": "wagtailcore.revision",
+  "pk": 2,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "base_content_type": [
+      "wagtailcore",
+      "page"
+    ],
+    "object_id": "5",
+    "created_at": "2026-02-12T11:43:38.264Z",
+    "user": null,
+    "object_str": "De ce „greșeala” este cel mai bun profesor de artă",
+    "content": {
+      "pk": 5,
+      "path": "0001000100010001",
+      "depth": 4,
+      "numchild": 0,
+      "translation_key": "12eab5d5-1777-4d39-a303-e2a506fe3cb6",
+      "locale": 1,
+      "latest_revision": null,
+      "live": true,
+      "has_unpublished_changes": false,
+      "first_published_at": null,
+      "last_published_at": null,
+      "live_revision": null,
+      "go_live_at": null,
+      "expire_at": null,
+      "expired": false,
+      "locked": false,
+      "locked_at": null,
+      "locked_by": null,
+      "title": "De ce „greșeala” este cel mai bun profesor de artă",
+      "draft_title": "De ce „greșeala” este cel mai bun profesor de artă",
+      "slug": "greseala-cel-mai-bun-profesor",
+      "content_type": 48,
+      "url_path": "/home/jurnal/greseala-cel-mai-bun-profesor/",
+      "owner": null,
+      "seo_title": "",
+      "show_in_menus": false,
+      "search_description": "",
+      "latest_revision_created_at": null,
+      "alias_of": null,
+      "category": "FILOSOFIE",
+      "excerpt": "În atelier, greșeala nu e eșec. E material brut pentru observație, curaj și limbaj vizual.",
+      "hero_image": 2,
+      "meta": "6 min · Atelier",
+      "body": "<p>În educația estetică, greșeala e un instrument – nu o rușine. Când copilul înțelege că o linie „ratată” poate deveni o idee nouă, se naște libertatea de a explora.</p>\n<p>În loc de corecturi rapide, lucrăm cu întrebări: Ce se întâmplă dacă? Cum se schimbă compoziția dacă mutăm centrul de greutate? Ce poveste spune pata?</p>\n<p>Așa apar ritmul, intenția și disciplina blândă: nu pentru note, ci pentru un limbaj personal care crește în timp.</p>",
+      "wagtail_admin_comments": []
+    },
+    "approved_go_live_at": null
+  }
+},
+{
+  "model": "wagtailcore.revision",
+  "pk": 3,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "base_content_type": [
+      "wagtailcore",
+      "page"
+    ],
+    "object_id": "6",
+    "created_at": "2026-02-12T11:43:38.307Z",
+    "user": null,
+    "object_str": "Materialele contează: de la tempera de supermarket la pigment profesionist",
+    "content": {
+      "pk": 6,
+      "path": "0001000100010002",
+      "depth": 4,
+      "numchild": 0,
+      "translation_key": "5dd7f383-aa84-44c1-b5fb-72833593a411",
+      "locale": 1,
+      "latest_revision": null,
+      "live": true,
+      "has_unpublished_changes": false,
+      "first_published_at": null,
+      "last_published_at": null,
+      "live_revision": null,
+      "go_live_at": null,
+      "expire_at": null,
+      "expired": false,
+      "locked": false,
+      "locked_at": null,
+      "locked_by": null,
+      "title": "Materialele contează: de la tempera de supermarket la pigment profesionist",
+      "draft_title": "Materialele contează: de la tempera de supermarket la pigment profesionist",
+      "slug": "materialele-conteaza",
+      "content_type": 48,
+      "url_path": "/home/jurnal/materialele-conteaza/",
+      "owner": null,
+      "seo_title": "",
+      "show_in_menus": false,
+      "search_description": "",
+      "latest_revision_created_at": null,
+      "alias_of": null,
+      "category": "MATERIALE",
+      "excerpt": "Diferența dintre „merge” și „se simte bine” vine adesea din material: densitate, granulație, lumină.",
+      "hero_image": 3,
+      "meta": "8 min · Practică",
+      "body": "<p>Materialele nu sunt un moft. Sunt un profesor tăcut. Un pigment bun îți arată imediat ce înseamnă transparență, stratificare și răbdare.</p>\n<p>La început, scopul nu e luxul, ci consistența: să poți repeta un gest și să înveți din el. Când materialul e imprevizibil, copilul învață frustrare – nu artă.</p>\n<p>Alegem instrumente care răsplătesc atenția: hârtie cu textură, pensule care țin apă, culori care nu „mor” pe foaie.</p>",
+      "wagtail_admin_comments": []
+    },
+    "approved_go_live_at": null
+  }
+},
+{
+  "model": "wagtailcore.revision",
+  "pk": 4,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "base_content_type": [
+      "wagtailcore",
+      "page"
+    ],
+    "object_id": "7",
+    "created_at": "2026-02-12T11:43:38.347Z",
+    "user": null,
+    "object_str": "Spațiul ca mentor: cum arhitectura influențează creativitatea",
+    "content": {
+      "pk": 7,
+      "path": "0001000100010003",
+      "depth": 4,
+      "numchild": 0,
+      "translation_key": "08c9444e-fb65-4208-b2bc-eaa32656b882",
+      "locale": 1,
+      "latest_revision": null,
+      "live": true,
+      "has_unpublished_changes": false,
+      "first_published_at": null,
+      "last_published_at": null,
+      "live_revision": null,
+      "go_live_at": null,
+      "expire_at": null,
+      "expired": false,
+      "locked": false,
+      "locked_at": null,
+      "locked_by": null,
+      "title": "Spațiul ca mentor: cum arhitectura influențează creativitatea",
+      "draft_title": "Spațiul ca mentor: cum arhitectura influențează creativitatea",
+      "slug": "spatiul-ca-mentor",
+      "content_type": 48,
+      "url_path": "/home/jurnal/spatiul-ca-mentor/",
+      "owner": null,
+      "seo_title": "",
+      "show_in_menus": false,
+      "search_description": "",
+      "latest_revision_created_at": null,
+      "alias_of": null,
+      "category": "SPAȚIU",
+      "excerpt": "Lumina, liniștea și proporțiile nu sunt decor. Sunt condiții care modelează atenția.",
+      "hero_image": 4,
+      "meta": "7 min · Observație",
+      "body": "<p>Un spațiu coerent invită la lucru profund. Lumina bună reduce graba. Ordinea reduce anxietatea. Aerul și distanțele dau curaj.</p>\n<p>Când copilul intră într-un loc care respectă actul artistic, își schimbă postura: devine mai atent, mai prezent.</p>\n<p>Într-un atelier, arhitectura devine un cadru moral: aici avem voie să încercăm, să repetăm și să tăcem.</p>",
+      "wagtail_admin_comments": []
+    },
+    "approved_go_live_at": null
+  }
+},
+{
+  "model": "wagtailcore.collection",
+  "fields": {
+    "path": "0001",
+    "depth": 1,
+    "numchild": 0,
+    "name": "Root"
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Editors"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "add_document",
+      "wagtaildocs",
+      "document"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "add_document",
+      "wagtaildocs",
+      "document"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Editors"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "change_document",
+      "wagtaildocs",
+      "document"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "change_document",
+      "wagtaildocs",
+      "document"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Editors"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "choose_document",
+      "wagtaildocs",
+      "document"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "choose_document",
+      "wagtaildocs",
+      "document"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Editors"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "add_image",
+      "wagtailimages",
+      "image"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "add_image",
+      "wagtailimages",
+      "image"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Editors"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "change_image",
+      "wagtailimages",
+      "image"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "change_image",
+      "wagtailimages",
+      "image"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Editors"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "choose_image",
+      "wagtailimages",
+      "image"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.groupcollectionpermission",
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "collection": [
+      "Root"
+    ],
+    "permission": [
+      "choose_image",
+      "wagtailimages",
+      "image"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.workflow",
+  "pk": 1,
+  "fields": {
+    "name": "Moderators approval",
+    "active": true
+  }
+},
+{
+  "model": "wagtailcore.workflowtask",
+  "pk": 1,
+  "fields": {
+    "sort_order": 0,
+    "workflow": 1,
+    "task": 1
+  }
+},
+{
+  "model": "wagtailcore.task",
+  "pk": 1,
+  "fields": {
+    "name": "Moderators approval",
+    "content_type": [
+      "wagtailcore",
+      "groupapprovaltask"
+    ],
+    "active": true
+  }
+},
+{
+  "model": "wagtailcore.groupapprovaltask",
+  "pk": 1,
+  "fields": {
+    "task_ptr": 1,
+    "groups": [
+      [
+        "Moderators"
+      ]
+    ]
+  }
+},
+{
+  "model": "wagtailcore.page",
+  "fields": {
+    "path": "0001",
+    "depth": 1,
+    "numchild": 1,
+    "translation_key": "b7497b02-7563-45e9-b46a-2ce8f114a948",
+    "locale": 1,
+    "latest_revision": null,
+    "live": true,
+    "has_unpublished_changes": false,
+    "first_published_at": null,
+    "last_published_at": null,
+    "live_revision": null,
+    "go_live_at": null,
+    "expire_at": null,
+    "expired": false,
+    "locked": false,
+    "locked_at": null,
+    "locked_by": null,
+    "title": "Root",
+    "draft_title": "Root",
+    "slug": "root",
+    "content_type": [
+      "wagtailcore",
+      "page"
+    ],
+    "url_path": "/",
+    "owner": null,
+    "seo_title": "",
+    "show_in_menus": false,
+    "search_description": "",
+    "latest_revision_created_at": null,
+    "alias_of": null
+  }
+},
+{
+  "model": "wagtailcore.page",
+  "fields": {
+    "path": "00010001",
+    "depth": 2,
+    "numchild": 1,
+    "translation_key": "2d308d8e-d294-44b4-bca7-75889c3d38df",
+    "locale": 1,
+    "latest_revision": null,
+    "live": true,
+    "has_unpublished_changes": false,
+    "first_published_at": null,
+    "last_published_at": null,
+    "live_revision": null,
+    "go_live_at": null,
+    "expire_at": null,
+    "expired": false,
+    "locked": false,
+    "locked_at": null,
+    "locked_by": null,
+    "title": "Home",
+    "draft_title": "Home",
+    "slug": "home",
+    "content_type": [
+      "home",
+      "homepage"
+    ],
+    "url_path": "/home/",
+    "owner": null,
+    "seo_title": "",
+    "show_in_menus": false,
+    "search_description": "",
+    "latest_revision_created_at": null,
+    "alias_of": null
+  }
+},
+{
+  "model": "wagtailcore.page",
+  "fields": {
+    "path": "000100010001",
+    "depth": 3,
+    "numchild": 3,
+    "translation_key": "3905ee52-9574-495e-9d3f-73652755ede9",
+    "locale": 1,
+    "latest_revision": 1,
+    "live": true,
+    "has_unpublished_changes": false,
+    "first_published_at": "2026-02-12T11:43:38.205Z",
+    "last_published_at": "2026-02-12T11:43:38.205Z",
+    "live_revision": 1,
+    "go_live_at": null,
+    "expire_at": null,
+    "expired": false,
+    "locked": false,
+    "locked_at": null,
+    "locked_by": null,
+    "title": "Jurnal",
+    "draft_title": "Jurnal",
+    "slug": "jurnal",
+    "content_type": [
+      "core",
+      "jurnalindexpage"
+    ],
+    "url_path": "/home/jurnal/",
+    "owner": null,
+    "seo_title": "",
+    "show_in_menus": false,
+    "search_description": "",
+    "latest_revision_created_at": "2026-02-12T11:43:38.199Z",
+    "alias_of": null
+  }
+},
+{
+  "model": "wagtailcore.page",
+  "fields": {
+    "path": "0001000100010001",
+    "depth": 4,
+    "numchild": 0,
+    "translation_key": "12eab5d5-1777-4d39-a303-e2a506fe3cb6",
+    "locale": 1,
+    "latest_revision": 2,
+    "live": true,
+    "has_unpublished_changes": false,
+    "first_published_at": "2026-02-12T11:43:38.269Z",
+    "last_published_at": "2026-02-12T11:43:38.269Z",
+    "live_revision": 2,
+    "go_live_at": null,
+    "expire_at": null,
+    "expired": false,
+    "locked": false,
+    "locked_at": null,
+    "locked_by": null,
+    "title": "De ce „greșeala” este cel mai bun profesor de artă",
+    "draft_title": "De ce „greșeala” este cel mai bun profesor de artă",
+    "slug": "greseala-cel-mai-bun-profesor",
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "url_path": "/home/jurnal/greseala-cel-mai-bun-profesor/",
+    "owner": null,
+    "seo_title": "",
+    "show_in_menus": false,
+    "search_description": "",
+    "latest_revision_created_at": "2026-02-12T11:43:38.264Z",
+    "alias_of": null
+  }
+},
+{
+  "model": "wagtailcore.page",
+  "fields": {
+    "path": "0001000100010002",
+    "depth": 4,
+    "numchild": 0,
+    "translation_key": "5dd7f383-aa84-44c1-b5fb-72833593a411",
+    "locale": 1,
+    "latest_revision": 3,
+    "live": true,
+    "has_unpublished_changes": false,
+    "first_published_at": "2026-02-12T11:43:38.312Z",
+    "last_published_at": "2026-02-12T11:43:38.312Z",
+    "live_revision": 3,
+    "go_live_at": null,
+    "expire_at": null,
+    "expired": false,
+    "locked": false,
+    "locked_at": null,
+    "locked_by": null,
+    "title": "Materialele contează: de la tempera de supermarket la pigment profesionist",
+    "draft_title": "Materialele contează: de la tempera de supermarket la pigment profesionist",
+    "slug": "materialele-conteaza",
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "url_path": "/home/jurnal/materialele-conteaza/",
+    "owner": null,
+    "seo_title": "",
+    "show_in_menus": false,
+    "search_description": "",
+    "latest_revision_created_at": "2026-02-12T11:43:38.307Z",
+    "alias_of": null
+  }
+},
+{
+  "model": "wagtailcore.page",
+  "fields": {
+    "path": "0001000100010003",
+    "depth": 4,
+    "numchild": 0,
+    "translation_key": "08c9444e-fb65-4208-b2bc-eaa32656b882",
+    "locale": 1,
+    "latest_revision": 4,
+    "live": true,
+    "has_unpublished_changes": false,
+    "first_published_at": "2026-02-12T11:43:38.352Z",
+    "last_published_at": "2026-02-12T11:43:38.352Z",
+    "live_revision": 4,
+    "go_live_at": null,
+    "expire_at": null,
+    "expired": false,
+    "locked": false,
+    "locked_at": null,
+    "locked_by": null,
+    "title": "Spațiul ca mentor: cum arhitectura influențează creativitatea",
+    "draft_title": "Spațiul ca mentor: cum arhitectura influențează creativitatea",
+    "slug": "spatiul-ca-mentor",
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "url_path": "/home/jurnal/spatiul-ca-mentor/",
+    "owner": null,
+    "seo_title": "",
+    "show_in_menus": false,
+    "search_description": "",
+    "latest_revision_created_at": "2026-02-12T11:43:38.347Z",
+    "alias_of": null
+  }
+},
+{
+  "model": "wagtailcore.grouppagepermission",
+  "pk": 1,
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "page": [
+      "/"
+    ],
+    "permission": [
+      "add_page",
+      "wagtailcore",
+      "page"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.grouppagepermission",
+  "pk": 2,
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "page": [
+      "/"
+    ],
+    "permission": [
+      "change_page",
+      "wagtailcore",
+      "page"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.grouppagepermission",
+  "pk": 3,
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "page": [
+      "/"
+    ],
+    "permission": [
+      "publish_page",
+      "wagtailcore",
+      "page"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.grouppagepermission",
+  "pk": 4,
+  "fields": {
+    "group": [
+      "Editors"
+    ],
+    "page": [
+      "/"
+    ],
+    "permission": [
+      "add_page",
+      "wagtailcore",
+      "page"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.grouppagepermission",
+  "pk": 5,
+  "fields": {
+    "group": [
+      "Editors"
+    ],
+    "page": [
+      "/"
+    ],
+    "permission": [
+      "change_page",
+      "wagtailcore",
+      "page"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.grouppagepermission",
+  "pk": 6,
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "page": [
+      "/"
+    ],
+    "permission": [
+      "lock_page",
+      "wagtailcore",
+      "page"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.grouppagepermission",
+  "pk": 7,
+  "fields": {
+    "group": [
+      "Moderators"
+    ],
+    "page": [
+      "/"
+    ],
+    "permission": [
+      "unlock_page",
+      "wagtailcore",
+      "page"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.workflowpage",
+  "pk": 1,
+  "fields": {
+    "workflow": 1
+  }
+},
+{
+  "model": "wagtailcore.pagelogentry",
+  "pk": 1,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalindexpage"
+    ],
+    "label": "Jurnal",
+    "action": "wagtail.create",
+    "data": {},
+    "timestamp": "2026-02-12T11:43:38.190Z",
+    "uuid": null,
+    "user": null,
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "page": [
+      "/home/jurnal/"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.pagelogentry",
+  "pk": 2,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalindexpage"
+    ],
+    "label": "Jurnal",
+    "action": "wagtail.publish",
+    "data": {},
+    "timestamp": "2026-02-12T11:43:38.213Z",
+    "uuid": null,
+    "user": null,
+    "revision": 1,
+    "content_changed": true,
+    "deleted": false,
+    "page": [
+      "/home/jurnal/"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.pagelogentry",
+  "pk": 3,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "label": "De ce „greșeala” este cel mai bun profesor de artă",
+    "action": "wagtail.create",
+    "data": {},
+    "timestamp": "2026-02-12T11:43:38.258Z",
+    "uuid": null,
+    "user": null,
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "page": [
+      "/home/jurnal/greseala-cel-mai-bun-profesor/"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.pagelogentry",
+  "pk": 4,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "label": "De ce „greșeala” este cel mai bun profesor de artă",
+    "action": "wagtail.publish",
+    "data": {},
+    "timestamp": "2026-02-12T11:43:38.276Z",
+    "uuid": null,
+    "user": null,
+    "revision": 2,
+    "content_changed": true,
+    "deleted": false,
+    "page": [
+      "/home/jurnal/greseala-cel-mai-bun-profesor/"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.pagelogentry",
+  "pk": 5,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "label": "Materialele contează: de la tempera de supermarket la pigment profesionist",
+    "action": "wagtail.create",
+    "data": {},
+    "timestamp": "2026-02-12T11:43:38.301Z",
+    "uuid": null,
+    "user": null,
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "page": [
+      "/home/jurnal/materialele-conteaza/"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.pagelogentry",
+  "pk": 6,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "label": "Materialele contează: de la tempera de supermarket la pigment profesionist",
+    "action": "wagtail.publish",
+    "data": {},
+    "timestamp": "2026-02-12T11:43:38.318Z",
+    "uuid": null,
+    "user": null,
+    "revision": 3,
+    "content_changed": true,
+    "deleted": false,
+    "page": [
+      "/home/jurnal/materialele-conteaza/"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.pagelogentry",
+  "pk": 7,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "label": "Spațiul ca mentor: cum arhitectura influențează creativitatea",
+    "action": "wagtail.create",
+    "data": {},
+    "timestamp": "2026-02-12T11:43:38.341Z",
+    "uuid": null,
+    "user": null,
+    "revision": null,
+    "content_changed": true,
+    "deleted": false,
+    "page": [
+      "/home/jurnal/spatiul-ca-mentor/"
+    ]
+  }
+},
+{
+  "model": "wagtailcore.pagelogentry",
+  "pk": 8,
+  "fields": {
+    "content_type": [
+      "core",
+      "jurnalarticlepage"
+    ],
+    "label": "Spațiul ca mentor: cum arhitectura influențează creativitatea",
+    "action": "wagtail.publish",
+    "data": {},
+    "timestamp": "2026-02-12T11:43:38.359Z",
+    "uuid": null,
+    "user": null,
+    "revision": 4,
+    "content_changed": true,
+    "deleted": false,
+    "page": [
+      "/home/jurnal/spatiul-ca-mentor/"
+    ]
+  }
+}

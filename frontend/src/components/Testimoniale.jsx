@@ -161,12 +161,12 @@ export default function Testimoniale() {
         <div className="relative text-center">
           <p
             className={[
-              "text-xs tracking-[0.26em] text-accent-600", // ✅ same style as ( PROCESUL DE SELECȚIE )
+              "text-xs tracking-[0.26em] text-accent-600",
               "transition-all duration-700 ease-out",
               inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
             ].join(" ")}
           >
-           ( TESTIMONIALE )
+            ( TESTIMONIALE )
           </p>
 
           <h2
@@ -180,10 +180,10 @@ export default function Testimoniale() {
             {(cmsTitle || "Vocile Comunității").trim()}
           </h2>
 
-          {/* Controls (mobile + desktop) */}
+          {/* ✅ Controls (even more subtle) */}
           <div
             className={[
-              "mt-6 flex items-center justify-center gap-3 sm:mt-8",
+              "mt-6 flex items-center justify-center gap-2 sm:mt-8",
               "transition-all duration-700 ease-out",
               inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1",
             ].join(" ")}
@@ -192,10 +192,20 @@ export default function Testimoniale() {
             <button
               type="button"
               onClick={() => scrollByCards(-1)}
-              className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-ink-200/60 bg-white/55 text-ink-700 backdrop-blur transition-all duration-300 hover:border-accent-600/50 hover:bg-white/70 hover:text-ink-900 hover:shadow-soft sm:h-10 sm:w-10"
+              className={[
+                "group inline-flex items-center justify-center",
+                "h-7 w-7 sm:h-8 sm:w-8",
+                "rounded-full",
+                "border border-ink-200/20",
+                "bg-transparent",
+                "text-ink-400/70",
+                "transition-all duration-300",
+                "hover:border-ink-200/40 hover:text-ink-600/80",
+                "active:scale-[0.99]",
+              ].join(" ")}
               aria-label="Derulează la stânga"
             >
-              <span className="text-[18px] leading-none transition-transform duration-300 group-hover:-translate-x-0.5">
+              <span className="text-[14px] leading-none transition-transform duration-300 group-hover:-translate-x-0.5">
                 ←
               </span>
             </button>
@@ -203,10 +213,20 @@ export default function Testimoniale() {
             <button
               type="button"
               onClick={() => scrollByCards(1)}
-              className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-ink-200/60 bg-white/55 text-ink-700 backdrop-blur transition-all duration-300 hover:border-accent-600/50 hover:bg-white/70 hover:text-ink-900 hover:shadow-soft sm:h-10 sm:w-10"
+              className={[
+                "group inline-flex items-center justify-center",
+                "h-7 w-7 sm:h-8 sm:w-8",
+                "rounded-full",
+                "border border-ink-200/20",
+                "bg-transparent",
+                "text-ink-400/70",
+                "transition-all duration-300",
+                "hover:border-ink-200/40 hover:text-ink-600/80",
+                "active:scale-[0.99]",
+              ].join(" ")}
               aria-label="Derulează la dreapta"
             >
-              <span className="text-[18px] leading-none transition-transform duration-300 group-hover:translate-x-0.5">
+              <span className="text-[14px] leading-none transition-transform duration-300 group-hover:translate-x-0.5">
                 →
               </span>
             </button>
@@ -255,7 +275,9 @@ export default function Testimoniale() {
                     <div className="h-px w-14 bg-accent-600/55" />
 
                     <div className="mt-5">
-                      <p className="text-sm font-medium text-ink-800">{t.name}</p>
+                      <p className="text-sm font-medium text-ink-800">
+                        {t.name}
+                      </p>
                       <p className="mt-1 text-xs tracking-wide text-ink-400">
                         {t.role}
                       </p>

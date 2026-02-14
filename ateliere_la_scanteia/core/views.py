@@ -4,20 +4,28 @@ import json
 from django.conf import settings
 from django.core.mail import send_mail
 from django.core.validators import validate_email
-from django.http import JsonResponse
-from django.utils.html import strip_tags
+from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from .models import MainPageContent, JurnalIndexPage, JurnalArticlePage
 
+from .models import MainPageContent, JurnalIndexPage, JurnalArticlePage
 
 
 def robots_txt(request):
     content = render_to_string("robots.txt")
     return HttpResponse(content, content_type="text/plain")
+
+
+def _img_url(img):
+    try:
+        return img.file.url if img else None
+    except Exception:
+        return None
+
+
+def _get_jurnal_index():
+    return JurnalIndexPage.objects.live().public().first()
 
 
 def mainpage_content(request):
@@ -33,13 +41,18 @@ def mainpage_content(request):
                 "kicker": content.hero_kicker,
                 "title": content.hero_title,
                 "subtitle": content.hero_subtitle,
-                "bg_image": content.hero_bg_image.file.url if content.hero_bg_image else None,
+                "bg_image": _img_url(content.hero_bg_image),
             },
             "spatiul": {
                 "label": content.spatiul_label,
                 "title": content.spatiul_title,
                 "paragraph": content.spatiul_paragraph,
-                "image_1": content.spatiul_image_1.file.url if content.spatiul_image_1 else None,
+
+                # ✅ NEW (you added in models)
+                "seo_blurb": content.spatiul_seo_blurb,
+                "hidden_keywords": content.spatiul_hidden_keywords,
+
+                "image_1": _img_url(content.spatiul_image_1),
                 "quote": content.spatiul_quote,
                 "stats": [
                     {"value": content.spatiul_stat_1_value, "label": content.spatiul_stat_1_label},
@@ -55,7 +68,7 @@ def mainpage_content(request):
                 "paragraph_1": content.filosofie_paragraph_1,
                 "paragraph_2": content.filosofie_paragraph_2,
                 "cta_text": content.filosofie_cta_text,
-                "image_2": content.filosofie_image_2.file.url if content.filosofie_image_2 else None,
+                "image_2": _img_url(content.filosofie_image_2),
                 "quote": content.filosofie_quote,
             },
             "testimoniale": {
@@ -82,8 +95,43 @@ def mainpage_content(request):
     )
 
 
-def _get_jurnal_index():
-    return JurnalIndexPage.objects.live().public().first()
+def _article_images(page: JurnalArticlePage):
+    """
+    Returns: [hero, gallery...], unique, ordered.
+    """
+    out = []
+    hero = _img_url(page.hero_image)
+    if hero:
+        out.append(hero)
+
+    # gallery images via Orderable relation
+    try:
+        for gi in page.gallery_images.all():
+            u = _img_url(gi.image)
+            if u and u not in out:
+                out.append(u)
+    except Exception:
+        pass
+
+    return out
+
+
+def _article_videos(page: JurnalArticlePage):
+    """
+    StreamField -> list of url strings.
+    Supports blocks named "video".
+    """
+    urls = []
+    try:
+        if page.videos:
+            for blk in page.videos:
+                if blk.block_type == "video":
+                    u = (blk.value or "").strip()
+                    if u:
+                        urls.append(u)
+    except Exception:
+        pass
+    return urls
 
 
 def jurnal_list(request):
@@ -103,12 +151,22 @@ def jurnal_list(request):
 
     items = []
     for p in items_qs:
+        images = _article_images(p)
+        videos = _article_videos(p)
+
         items.append(
             {
                 "slug": p.slug,
                 "category": p.category,
                 "title": p.title,
-                "image": p.hero_image.file.url if p.hero_image else None,
+
+                # compat cu frontend-ul actual
+                "image": _img_url(p.hero_image),
+
+                # ✅ NEW for gallery + cards carousel
+                "images": images,
+                "videos": videos,
+
                 "excerpt": p.excerpt,
                 "meta": p.meta,
             }
@@ -145,13 +203,23 @@ def jurnal_detail(request, slug):
     if not page:
         return JsonResponse({"detail": None}, status=404)
 
+    images = _article_images(page)
+    videos = _article_videos(page)
+
     return JsonResponse(
         {
             "detail": {
                 "slug": page.slug,
                 "category": page.category,
                 "title": page.title,
-                "image": page.hero_image.file.url if page.hero_image else None,
+
+                # compat
+                "image": _img_url(page.hero_image),
+
+                # ✅ NEW
+                "images": images,
+                "videos": videos,
+
                 "excerpt": page.excerpt,
                 "meta": page.meta,
                 "body_html": str(page.body) if page.body else "",
@@ -217,7 +285,6 @@ def membrie_application(request):
 
     subject = f"[Membrie] Aplicație nouă – {parent_name} / {child_name}"
 
-    # Plain text version
     message = (
         "A fost trimisă o aplicație nouă (Membrie):\n\n"
         f"Părinte: {parent_name}\n"
@@ -231,7 +298,6 @@ def membrie_application(request):
         f"Sursa: {source}\n"
     )
 
-    # HTML version (uses template)
     context = {
         "parent_name": parent_name,
         "phone": phone,
@@ -244,10 +310,7 @@ def membrie_application(request):
         "submitted_at": timezone.localtime().strftime("%d %b %Y, %H:%M"),
     }
 
-    html_message = render_to_string(
-        "emails/membrie_application.html",
-        context,
-    )
+    html_message = render_to_string("emails/membrie_application.html", context)
 
     try:
         send_mail(

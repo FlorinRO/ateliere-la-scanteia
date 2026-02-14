@@ -42,8 +42,7 @@ export default function Manifest() {
   }, []);
 
   const fallbackLabel = "( PROCESUL DE SELECȚIE )";
-  const fallbackTitle =
-    "Accesul este limitat la\n12 membri pe sezon.";
+  const fallbackTitle = "Accesul este limitat la\n12 membri pe sezon.";
   const fallbackText =
     "Căutăm familii care înțeleg că educația estetică este o investiție pe viață.\nNu vindem cursuri. Construim fundații artistice.";
 
@@ -80,32 +79,72 @@ export default function Manifest() {
     <IconArchive key="i3" />,
   ];
 
-  // ✅ Styled 12 with proper spacing
+  // ✅ "12 membri" stays on same line; 12 uses alt font, same color, slightly smaller
   const renderTitleWithStyled12 = (text) => {
     if (!text) return null;
 
-    const parts = String(text).split(/(12)/g);
+    const str = String(text);
+    const idx = str.indexOf("12");
+    if (idx === -1) return str;
 
-    return parts.map((part, idx) => {
-      if (part === "12") {
-        return (
-          <span key={`twelve-${idx}`}>
-            {"\u00A0"}
+    const before = str.slice(0, idx);
+    const after = str.slice(idx + 2);
+
+    const m = after.match(/^(\s*)(membri)\b/i);
+
+    if (m) {
+      const spaces = m[1] || " ";
+      const membriWord = m[2];
+      const rest = after.slice((m[1] || "").length + membriWord.length);
+
+      const needsSpaceBefore12 = before.length > 0 && !/\s$/.test(before);
+
+      return (
+        <>
+          <span>{before}</span>
+          {needsSpaceBefore12 ? "\u00A0" : null}
+          <span className="whitespace-nowrap">
             <span
               className={[
-                "inline-block align-baseline",
-                "font-black not-italic tracking-tight",
+                "font-mono",
+                "not-italic",
                 "text-accent-600",
-                "text-[1.15em] sm:text-[1.22em]",
+                "text-[0.9em]",
+                "align-baseline",
               ].join(" ")}
             >
               12
             </span>
+            {spaces === " " ? "\u00A0" : spaces.replace(/ /g, "\u00A0")}
+            <span>{membriWord}</span>
           </span>
-        );
-      }
+          <span>{rest}</span>
+        </>
+      );
+    }
 
-      return <span key={`part-${idx}`}>{part}</span>;
+    // fallback if not "12 membri"
+    const parts = str.split(/(12)/g);
+    return parts.map((part, i) => {
+      if (part !== "12") return <span key={`p-${i}`}>{part}</span>;
+      const prev = parts[i - 1] || "";
+      const needsSpace = prev && !/\s$/.test(prev);
+      return (
+        <span key={`t-${i}`}>
+          {needsSpace ? "\u00A0" : null}
+          <span
+            className={[
+              "font-mono",
+              "not-italic",
+              "text-accent-600",
+              "text-[0.9em]",
+              "align-baseline",
+            ].join(" ")}
+          >
+            12
+          </span>
+        </span>
+      );
     });
   };
 
@@ -174,7 +213,11 @@ function Card({ icon, title, text }) {
           {icon}
         </div>
 
-        <h3 className="text-xl font-semibold text-ink-900">{title}</h3>
+        {/* ✅ Title font size +1 */}
+        <h3 className="text-[22px] sm:text-[23px] font-semibold leading-tight text-ink-900">
+          {title}
+        </h3>
+
         <p className="mt-3 text-[15px] leading-relaxed text-ink-700">{text}</p>
 
         <div className="mt-7 h-[1px] w-16 bg-accent-600/60" />
@@ -186,10 +229,30 @@ function Card({ icon, title, text }) {
 function IconGroup() {
   return (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-      <path d="M16 11a3 3 0 1 0-6 0v1a3 3 0 0 0 6 0v-1Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M7.5 21c.6-3.3 3-5 4.5-5h0c1.5 0 3.9 1.7 4.5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M6.5 11.5a2.5 2.5 0 1 1 3.2-2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M4.7 21c.3-2 .9-3.2 1.8-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path
+        d="M16 11a3 3 0 1 0-6 0v1a3 3 0 0 0 6 0v-1Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M7.5 21c.6-3.3 3-5 4.5-5h0c1.5 0 3.9 1.7 4.5 5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6.5 11.5a2.5 2.5 0 1 1 3.2-2.4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M4.7 21c.3-2 .9-3.2 1.8-4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -197,9 +260,24 @@ function IconGroup() {
 function IconCap() {
   return (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-      <path d="M3 9.5 12 5l9 4.5-9 4.5L3 9.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-      <path d="M7 12.2V16c0 1.7 2.2 3 5 3s5-1.3 5-3v-3.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M21 10v5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path
+        d="M3 9.5 12 5l9 4.5-9 4.5L3 9.5Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7 12.2V16c0 1.7 2.2 3 5 3s5-1.3 5-3v-3.8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M21 10v5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -207,9 +285,24 @@ function IconCap() {
 function IconArchive() {
   return (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-      <path d="M6 8V6.8c0-.4.3-.8.8-.8h10.4c.5 0 .8.4.8.8V8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M7 8h10v11c0 .6-.4 1-1 1H8c-.6 0-1-.4-1-1V8Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-      <path d="M10 12h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path
+        d="M6 8V6.8c0-.4.3-.8.8-.8h10.4c.5 0 .8.4.8.8V8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M7 8h10v11c0 .6-.4 1-1 1H8c-.6 0-1-.4-1-1V8Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10 12h4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
