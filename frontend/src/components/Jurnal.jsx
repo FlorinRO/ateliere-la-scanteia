@@ -48,12 +48,17 @@ function apiUrl(path) {
 // -------------------------
 function resolveMediaUrl(url) {
   if (!url) return null;
+
+  // absolute URLs: keep
   if (/^https?:\/\//i.test(url)) return url;
 
-  // Important: when backend returns /media/..., we need to prefix with backend in prod
-  // Local dev can keep relative (proxy), but prod needs absolute.
+  // We must prefix media URLs with backend base in production
   const base = (import.meta?.env?.VITE_API_BASE_URL || "").replace(/\/$/, "");
+
+  // If no base, return as root-relative (local dev/proxy)
   if (!base) return url.startsWith("/") ? url : `/${url}`;
+
+  // Always prefix root-relative paths (like /media/...) with backend base
   return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
