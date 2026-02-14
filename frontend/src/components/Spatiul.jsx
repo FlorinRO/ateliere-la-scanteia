@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+// Spatiul.jsx
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import spatiulImg1 from "../assets/spatiul1.jpeg";
 import spatiulImg2 from "../assets/spatiul2.jpeg";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -15,6 +22,36 @@ function splitLines(text) {
     .split(/\r?\n/)
     .map((s) => s.trim())
     .filter(Boolean);
+}
+
+/**
+ * ✅ No setState in effect (passes react-hooks/set-state-in-effect)
+ * Uses useSyncExternalStore (React 18).
+ */
+function useMediaQuery(query) {
+  const getSnapshot = () => {
+    if (typeof window === "undefined" || !window.matchMedia) return false;
+    return window.matchMedia(query).matches;
+  };
+
+  const getServerSnapshot = () => false;
+
+  const subscribe = (callback) => {
+    if (typeof window === "undefined" || !window.matchMedia) return () => {};
+    const mql = window.matchMedia(query);
+
+    const onChange = () => callback();
+
+    if (mql.addEventListener) mql.addEventListener("change", onChange);
+    else mql.addListener(onChange);
+
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener("change", onChange);
+      else mql.removeListener(onChange);
+    };
+  };
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 function useInView(options = { threshold: 0.18 }, rootEl = null) {
@@ -92,8 +129,6 @@ function useScrollProgress(ref, scrollEl) {
 
 /**
  * ✅ Delayed reveal that RE-RUNS, without setState sync inside effect body
- * - when === true  -> start timer -> setOn(true)
- * - when === false -> cleanup will reset (setOn(false)) + cancel timer, so next time it re-animates
  */
 function useDelayedReveal(when, delayMs = 180) {
   const [on, setOn] = useState(false);
@@ -103,23 +138,18 @@ function useDelayedReveal(when, delayMs = 180) {
     let cancelled = false;
 
     if (when) {
-      // show with delay
       t = setTimeout(() => {
         if (cancelled) return;
         setOn(true);
       }, delayMs);
     }
 
-    // IMPORTANT: reset in cleanup (runs when `when` changes or unmount)
     return () => {
       cancelled = true;
       if (t) clearTimeout(t);
 
-      // reset only when leaving the trigger (so we can re-run next time)
       if (!when) return;
 
-      // `when` was true for this effect instance, so leaving it means next render has when=false.
-      // Reset is deferred via rAF to avoid "sync setState in effect" lint rule.
       requestAnimationFrame(() => setOn(false));
     };
   }, [when, delayMs]);
@@ -135,25 +165,41 @@ export default function Spatiul({ scrollEl }) {
 
   const observerRoot = scrollEl?.current || null;
 
+  // ✅ Tailwind "sm" breakpoint: under 640px = mobile
+  const isMobile = useMediaQuery("(max-width: 639px)");
+
   const [wrapRef] = useInView({ threshold: 0.12 }, observerRoot);
+
   const [imgRef, imgIn] = useInView({ threshold: 0.22 }, observerRoot);
   const [textRef, textIn] = useInView({ threshold: 0.22 }, observerRoot);
   const spP = useScrollProgress(wrapRef, scrollEl);
 
-  const [filoWrapRef, filoIn] = useInView({ threshold: 0.16 }, observerRoot);
-  const [filoImgRef, filoImgIn] = useInView({ threshold: 0.2 }, observerRoot);
-  const [filoTextRef, filoTextIn] = useInView(
-    { threshold: 0.2 },
-    observerRoot
-  );
+  // ✅ Filosofie: earlier on mobile
+  const filoWrapOpts = useMemo(() => ({ threshold: 0.16 }), []);
+
+  const filoImgOpts = useMemo(() => {
+    return isMobile
+      ? { threshold: 0.12, rootMargin: "140px 0px 80px 0px" }
+      : { threshold: 0.2, rootMargin: "0px 0px 0px 0px" };
+  }, [isMobile]);
+
+  const filoTextOpts = useMemo(() => ({ threshold: 0.2 }), []);
+
+  const [filoWrapRef, filoIn] = useInView(filoWrapOpts, observerRoot);
+  const [filoImgRef, filoImgIn] = useInView(filoImgOpts, observerRoot);
+  const [filoTextRef, filoTextIn] = useInView(filoTextOpts, observerRoot);
+
   const filoP = useScrollProgress(filoWrapRef, scrollEl);
 
-  // ✅ Trigger zones (tweak if you want earlier/later)
+  // ✅ Trigger zones
   const spQuoteTrigger = imgIn && spP > 0.38;
-  const fiQuoteTrigger = filoImgIn && filoP > 0.52;
+
+  const fiProgressThreshold = isMobile ? 0.3 : 0.52;
+  const fiQuoteTrigger = filoImgIn && filoP > fiProgressThreshold;
 
   const spQuoteOn = useDelayedReveal(spQuoteTrigger, 180);
-  const fiQuoteOn = useDelayedReveal(fiQuoteTrigger, 220);
+  const fiQuoteDelay = isMobile ? 140 : 220;
+  const fiQuoteOn = useDelayedReveal(fiQuoteTrigger, fiQuoteDelay);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -260,6 +306,7 @@ export default function Spatiul({ scrollEl }) {
     "break-words [overflow-wrap:anywhere] whitespace-normal",
   ].join(" ");
 
+  // ✅ Use it (no unused-vars)
   const goToMembrie = () => {
     const targetHash = "#membrie";
     if (location?.hash === targetHash) {

@@ -1,3 +1,4 @@
+// Navbar.jsx
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../assets/Ateliere_la_Scanteia.svg";
@@ -78,6 +79,31 @@ export default function Navbar() {
 
   const onSolicitaAcces = onHashNav("membrie");
 
+  // --- NEW: always scroll-to-top when logo clicked ---
+  const onLogoClick = (e) => {
+    // Prevent default link behavior to control navigation + scroll explicitly
+    if (e && typeof e.preventDefault === "function") e.preventDefault();
+    setOpen(false);
+
+    // If we're not on the home path, navigate there first.
+    // If we are already on '/', this does nothing — but we still want to scroll.
+    if (location.pathname !== "/") {
+      navigate("/");
+      // Give the navigation one frame to mount content, then scroll.
+      requestAnimationFrame(() => {
+        // a small timeout helps in some edge cases where layout isn't ready yet
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }, 40);
+      });
+      return;
+    }
+
+    // Already on home path — just scroll to top.
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  // ---------------------------------------------------
+
   // ESC close
   useEffect(() => {
     const onKeyDown = (e) => {
@@ -121,7 +147,8 @@ export default function Navbar() {
     <header ref={headerRef} className={headerClasses}>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
         {/* Logo */}
-        <Link to="/" className="flex items-center">
+        {/* use a button-like Link with explicit onClick so we always scroll to top */}
+        <Link to="/" className="flex items-center" onClick={onLogoClick}>
           <img
             src={Logo}
             alt="Ateliere la Scânteia"
@@ -203,7 +230,10 @@ export default function Navbar() {
           ].join(" ")}
         >
           <div className="flex items-center justify-between">
-            <img src={Logo} alt="Ateliere la Scânteia" className="h-9 w-auto" />
+            {/* same click behaviour for mobile logo */}
+            <button onClick={onLogoClick} className="p-0 bg-transparent border-0">
+              <img src={Logo} alt="Ateliere la Scânteia" className="h-9 w-auto" />
+            </button>
             <button
               className="text-black p-2"
               onClick={() => setOpen(false)}

@@ -461,11 +461,13 @@ function MediaCarousel({
     const from = dir > 0 ? "translate-x-[8px]" : "translate-x-[-8px]";
     const base = [
       "absolute inset-0 h-full w-full",
+      active ? "pointer-events-auto" : "pointer-events-none", // ✅ IMPORTANT
       "transition-[opacity,transform,filter] duration-[900ms] ease-out",
       active
         ? "opacity-100 scale-[1.03] translate-x-0 blur-0"
         : `opacity-0 scale-[1.2] ${from} blur-[0.9px]`,
     ].join(" ");
+    
 
     if (item?.type === "youtube" || item?.type === "vimeo") {
       return (
@@ -760,7 +762,7 @@ function ArticleVideoCard({ videos, title = "Video" }) {
           showArrows={mediaItems.length > 1}
           showDots={mediaItems.length > 1}
           pauseOnHover={true}
-          className="h-[420px] w-full sm:h-[520px] lg:h-[560px]"
+          className="aspect-video w-full"
           imgClassName="h-full w-full object-cover"
           arrowsAlways={true}
         />
