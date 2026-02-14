@@ -6,8 +6,9 @@ import jurnal2 from "../assets/jurnal2.jpeg";
 import jurnal3 from "../assets/jurnal3.jpeg";
 
 // NEW: extra images for carousels (as requested)
-import jurnalSpatiulMentor2 from "../assets/jurnal-spatiul-mentor.jpeg";
-import jurnalProfesorArte2 from "../assets/jurnal-profesor-arte.jpeg";
+const jurnalSpatiulMentor2 = "/assets/jurnal-spatiul-mentor.jpeg";
+const jurnalProfesorArte2 = "/assets/jurnal-profesor-arte.jpeg";
+
 
 /**
  * Jurnal – editorial grid + separate page per article (SEO friendly).
