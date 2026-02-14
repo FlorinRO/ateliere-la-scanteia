@@ -94,6 +94,8 @@ INSTALLED_APPS = [
     "django_filters",
     "rest_framework",
     "corsheaders",
+
+    # Django contrib apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -101,6 +103,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
+    "django.contrib.postgres",  # ✅ REQUIRED for Postgres search fields / GinIndex
+
     "core",
 ]
 
@@ -223,7 +227,7 @@ if PUBLIC_BASE_URL:
 
 
 # ------------------------------------------------------------
-# CSRF / ADMIN LOGIN FIX (THIS FIXES YOUR RAILWAY ERROR)
+# CSRF / ADMIN LOGIN FIX
 # ------------------------------------------------------------
 CSRF_TRUSTED_ORIGINS = []
 
@@ -233,10 +237,8 @@ if PUBLIC_BASE_URL.startswith("https://"):
 if RAILWAY_PUBLIC_DOMAIN:
     CSRF_TRUSTED_ORIGINS.append(f"https://{RAILWAY_PUBLIC_DOMAIN}")
 
-# Known Railway app URL fallback
 CSRF_TRUSTED_ORIGINS.append("https://ateliere-la-scanteia-production.up.railway.app")
 
-# Cookies over HTTPS in production
 if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
@@ -307,7 +309,6 @@ WAGTAILSEARCH_BACKENDS = {
     }
 }
 
-# Base URL used by Wagtail admin for absolute links in notifications
 WAGTAILADMIN_BASE_URL = PUBLIC_BASE_URL or "http://localhost:8000"
 
 WAGTAILDOCS_EXTENSIONS = [
