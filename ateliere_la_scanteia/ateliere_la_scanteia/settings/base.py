@@ -63,7 +63,7 @@ if PUBLIC_BASE_URL:
 if RAILWAY_PUBLIC_DOMAIN:
     ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
 
-# (Optional) if you know you always deploy under this Railway URL, keep it as fallback
+# (Optional) keep known Railway URL as fallback
 ALLOWED_HOSTS.append("ateliere-la-scanteia-production.up.railway.app")
 
 # IMPORTANT for Railway / proxies: ensure Django knows requests are HTTPS
@@ -142,36 +142,26 @@ WSGI_APPLICATION = "ateliere_la_scanteia.wsgi.application"
 # ------------------------------------------------------------
 # DATABASE
 # ------------------------------------------------------------
-# Railway Postgres:
-# - When you add a Postgres DB in Railway, it provides DATABASE_URL
-# - If DATABASE_URL is present, we use it; otherwise we fall back to local SQLite.
-DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+# Railway Postgres provides DATABASE_URL.
+# We ONLY use Postgres when DATABASE_URL is present.
+# Otherwise we fall back to local SQLite.
+
+DATABASE_URL = (os.getenv("DATABASE_URL") or "").strip()
 
 if DATABASE_URL:
-    try:
-        import dj_database_url
+    import dj_database_url
 
-        DATABASES = {
-            "default": dj_database_url.parse(
-                DATABASE_URL,
-                conn_max_age=600,
-                ssl_require=True,
-            )
-        }
-    except Exception:
-        # Fallback (shouldn't happen in prod if dj-database-url is installed)
-        DATABASES = {
-            "default": {
-                "ENGINE": "django.db.backends.postgresql",
-                "NAME": os.getenv("PGDATABASE", ""),
-                "USER": os.getenv("PGUSER", ""),
-                "PASSWORD": os.getenv("PGPASSWORD", ""),
-                "HOST": os.getenv("PGHOST", ""),
-                "PORT": os.getenv("PGPORT", "5432"),
-                "CONN_MAX_AGE": 600,
-                "OPTIONS": {"sslmode": "require"},
-            }
-        }
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+        )
+    }
+
+    # Require SSL in production by default (Railway managed Postgres supports it)
+    if not DEBUG:
+        DATABASES["default"].setdefault("OPTIONS", {})
+        DATABASES["default"]["OPTIONS"].setdefault("sslmode", "require")
 else:
     DATABASES = {
         "default": {
@@ -235,7 +225,6 @@ if PUBLIC_BASE_URL:
 # ------------------------------------------------------------
 # CSRF / ADMIN LOGIN FIX (THIS FIXES YOUR RAILWAY ERROR)
 # ------------------------------------------------------------
-# Django checks request Origin for unsafe methods (POST) and blocks if not trusted.
 CSRF_TRUSTED_ORIGINS = []
 
 if PUBLIC_BASE_URL.startswith("https://"):
@@ -319,7 +308,6 @@ WAGTAILSEARCH_BACKENDS = {
 }
 
 # Base URL used by Wagtail admin for absolute links in notifications
-# IMPORTANT: set PUBLIC_BASE_URL on Railway so this becomes correct.
 WAGTAILADMIN_BASE_URL = PUBLIC_BASE_URL or "http://localhost:8000"
 
 WAGTAILDOCS_EXTENSIONS = [
