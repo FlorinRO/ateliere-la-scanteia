@@ -83,15 +83,21 @@ function mediaDedupeKey(resolvedUrl) {
   // take only filename
   const parts = noQ.split("/");
   const filename = (parts[parts.length - 1] || "").trim();
-  if (!filename) return noQ.replace(/\/$/, "");
+  if (!filename) return noQ.replace(/\/$/, "").toLowerCase();
 
-  // strip vite hash: name-<hash>.ext  => name.ext
-  // (hash usually 6+ chars, alnum)
-  const m = filename.match(/^(.+?)-[a-z0-9]{6,}(\.[a-z0-9]+)$/i);
-  const normalizedFilename = m ? `${m[1]}${m[2]}` : filename;
+  // 1) strip vite hash: name-<hash>.ext => name.ext
+  const vite = filename.match(/^(.+?)-[a-z0-9]{6,}(\.[a-z0-9]+)$/i);
+  let name = vite ? `${vite[1]}${vite[2]}` : filename;
 
-  // key based on normalized filename (most stable), fallback to full path
-  return normalizedFilename.toLowerCase();
+  // 2) strip wagtail rendition suffixes: name.max-165x165.jpg / name.fill-800x600.jpg etc
+  // (we dedupe by "stem" anyway, but this makes it more stable)
+  name = name.replace(/\.(max|fill|width|height)-\d+x\d+(?=\.[a-z0-9]+$)/i, "");
+  name = name.replace(/\.(max|fill|width|height)-\d+(?=\.[a-z0-9]+$)/i, "");
+
+  // 3) dedupe by stem (no extension) so .jpg and .jpeg count as same image
+  const stem = name.replace(/\.[a-z0-9]+$/i, "");
+
+  return stem.toLowerCase();
 }
 
 function dedupeByResolvedUrl(urls) {
@@ -253,27 +259,32 @@ function withExtraImagesBySlug(article) {
   const baseImages = normalizeImages(article?.images, article?.image);
   const list = baseImages.slice();
 
-  const toKey = (u) => String(resolveMediaUrl(u) || "").trim().replace(/\/$/, "");
+  // ✅ Only inject fallback extras if Wagtail didn't give enough images
+  const needsTwo =
+    slug === "spatiul-ca-mentor" || slug === "greseala-cel-mai-bun-profesor";
+
+  const keyOf = (u) => mediaDedupeKey(resolveMediaUrl(u) || u);
 
   const addIfMissing = (img) => {
     const resolved = resolveMediaUrl(img);
     if (!resolved) return;
 
-    // compare by normalized key, not by raw string
-    const key = toKey(resolved);
-    const existingKeys = new Set(list.map((x) => toKey(x)));
-    if (existingKeys.has(key)) return;
+    const key = keyOf(resolved);
+    const existingKeys = new Set(list.map((x) => keyOf(x)));
 
+    if (key && existingKeys.has(key)) return;
     list.push(resolved);
   };
 
-  if (slug === "spatiul-ca-mentor") {
-    addIfMissing(jurnalSpatiulMentor2);
-  } else if (slug === "greseala-cel-mai-bun-profesor") {
-    addIfMissing(jurnalProfesorArte2);
+  if (needsTwo && list.length < 2) {
+    if (slug === "spatiul-ca-mentor") {
+      addIfMissing(jurnalSpatiulMentor2);
+    } else if (slug === "greseala-cel-mai-bun-profesor") {
+      addIfMissing(jurnalProfesorArte2);
+    }
   }
 
-  // ✅ FINAL DEDUPE (fix: “îmi arată 3 imagini dar am doar 2”)
+  // ✅ FINAL DEDUPE
   const finalImages = dedupeByResolvedUrl(list.length ? list : baseImages);
 
   return {
