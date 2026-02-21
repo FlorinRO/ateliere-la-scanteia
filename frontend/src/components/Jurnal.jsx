@@ -1338,7 +1338,7 @@ export function JurnalArticlePage() {
           </div>
         </div>
 
-        {/* HERO (images only) */}
+        {/* HERO (images only) — clean slideshow header (no heavy gradient) */}
         <header className="mt-6 overflow-hidden rounded-none border-y border-ink-200/70 bg-white/60 shadow-[0_60px_160px_rgba(0,0,0,0.16)] backdrop-blur-[2px] sm:mt-8 sm:rounded-[2.75rem] sm:border sm:mx-0">
           <button
             type="button"
@@ -1360,14 +1360,16 @@ export function JurnalArticlePage() {
                 />
               </div>
 
+              {/* ✅ Remove heavy gradient overlay. Keep only a very subtle edge safety */}
               <div
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(to top, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.24) 46%, rgba(0,0,0,0.06) 100%)",
+                    "linear-gradient(to top, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.06) 42%, rgba(0,0,0,0.00) 100%)",
                 }}
               />
 
+              {/* Fullscreen icon */}
               <div className="pointer-events-none absolute right-5 top-5 z-30">
                 <div
                   className={[
@@ -1382,20 +1384,32 @@ export function JurnalArticlePage() {
                 </div>
               </div>
 
-              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-14">
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-black/15 blur-2xl" />
-                <div className="relative">
-                  <h1 className="text-3xl font-semibold leading-[1.04] text-white sm:text-6xl">
-                    {patchedA.title}
-                  </h1>
-                  <p className="mt-4 max-w-4xl text-[15px] italic leading-relaxed text-white/90 sm:text-[16px]">
-                    - {patchedA.excerpt}
-                  </p>
+              {/* ✅ Small indicator (clean) */}
+              {safeHeaderImages.length > 1 ? (
+                <div className="pointer-events-none absolute left-5 top-5 z-30">
+                  <div className="rounded-2xl border border-white/20 bg-black/15 px-4 py-2 text-[11px] tracking-[0.22em] text-white/90 backdrop-blur">
+                    {headerIdx + 1}/{safeHeaderImages.length}
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           </button>
         </header>
+
+        {/* ✅ Title moved BELOW header */}
+        <div className="mt-8 px-6 sm:px-0">
+          <h1 className="text-4xl font-semibold leading-[1.05] text-ink-900 sm:text-6xl">
+            {patchedA.title}
+          </h1>
+
+          {patchedA.excerpt ? (
+            <p className="mt-5 max-w-4xl text-[15px] italic leading-relaxed text-ink-700/90 sm:text-[16px]">
+              - {patchedA.excerpt}
+            </p>
+          ) : null}
+
+          <div className="mt-7 h-px w-full bg-gradient-to-r from-transparent via-ink-200/70 to-transparent" />
+        </div>
 
         <FullscreenGallery
           open={lightboxOpen}

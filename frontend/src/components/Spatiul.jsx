@@ -24,6 +24,82 @@ function splitLines(text) {
     .filter(Boolean);
 }
 
+function cleanText(s) {
+  return String(s || "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * ✅ Fix for “words jump to next line too early”
+ * In CMS textareas, people often paste content that contains HARD line breaks
+ * (newlines) inside a paragraph. Your previous splitLines() turned EACH newline
+ * into a new <p>, which visually looks like “it wraps even if there's space”.
+ *
+ * This helper:
+ * - keeps real paragraph breaks (blank lines)
+ * - removes single newlines inside paragraphs (joins them with spaces)
+ */
+function splitParagraphs(text) {
+  if (!text) return [];
+  const raw = String(text).replace(/\r\n/g, "\n");
+
+  // split by blank line(s) => paragraph boundaries
+  const paras = raw
+    .split(/\n\s*\n+/)
+    .map((p) => p.replace(/\n+/g, " ")) // join hard line breaks inside paragraph
+    .map((p) => cleanText(p))
+    .filter(Boolean);
+
+  return paras;
+}
+
+function normForCompare(s) {
+  return cleanText(s).toLowerCase();
+}
+
+/**
+ * Make sure we always render Filosofie title as 2 clean lines:
+ *   Sanctuar privat.
+ *   Libertate radicală.
+ * even if CMS sends "Sanctuar privat. Libertate radicală." + "Libertate radicală."
+ */
+function normalizeTwoLineTitle(raw1, raw2) {
+  const a = cleanText(raw1);
+  const b = cleanText(raw2);
+
+  const nl = splitLines(a);
+  if (nl.length >= 2) {
+    const t1 = nl[0];
+    const t2 = nl.slice(1).join(" ");
+    if (normForCompare(t1) === normForCompare(t2)) return { t1, t2: "" };
+    return { t1, t2 };
+  }
+
+  if (b && normForCompare(a).includes(normForCompare(b))) {
+    const parts = a
+      .split(/(?<=[.!?])\s+/)
+      .map((x) => cleanText(x))
+      .filter(Boolean);
+
+    if (parts.length >= 2) {
+      const t1 = parts[0];
+      const t2 = parts.slice(1).join(" ");
+      if (normForCompare(t2) === normForCompare(b)) return { t1, t2: b };
+      return { t1, t2 };
+    }
+
+    if (normForCompare(a) === normForCompare(b)) return { t1: a, t2: "" };
+    return {
+      t1: a.replace(new RegExp(`\\s*${b}\\s*`, "i"), "").trim() || a,
+      t2: b,
+    };
+  }
+
+  if (b && normForCompare(a) === normForCompare(b)) return { t1: a, t2: "" };
+  return { t1: a, t2: b };
+}
+
 /**
  * ✅ No setState in effect (passes react-hooks/set-state-in-effect)
  * Uses useSyncExternalStore (React 18).
@@ -157,6 +233,98 @@ function useDelayedReveal(when, delayMs = 180) {
   return on;
 }
 
+/** Single “card” like SPAȚIUL */
+function ReadableLines({ lines, variant = "body", accent = true }) {
+  const safe = Array.isArray(lines) ? lines.filter(Boolean) : [];
+  if (!safe.length) return null;
+
+  const isSEO = variant === "seo";
+
+  return (
+    <div
+      className={[
+        "mt-4 max-w-prose",
+        "rounded-2xl",
+        isSEO
+          ? "bg-white/45 ring-1 ring-black/5"
+          : "bg-white/55 ring-1 ring-black/5 shadow-soft",
+        "px-5 py-5",
+      ].join(" ")}
+    >
+      <div
+        className={[
+          "relative",
+          "pl-4",
+          accent ? "border-l-2 border-accent-600/25" : "border-l border-ink-200/70",
+        ].join(" ")}
+      >
+        <div className={isSEO ? "space-y-2" : "space-y-3"}>
+        {safe.map((line, idx) => (
+            <p
+              key={idx}
+              className={
+                isSEO
+                  ? "text-[13px] leading-[1.75] text-ink-600"
+                  : "text-[15px] leading-[1.85] text-ink-700"
+              }
+            >
+              {line}
+            </p>
+          ))}
+        </div>
+
+        <div className="pointer-events-none absolute -left-[2px] top-0 h-10 w-[2px] bg-gradient-to-b from-accent-600/45 to-transparent" />
+      </div>
+    </div>
+  );
+}
+
+/** Single container for multiple blocks (Filosofie should match Spațiul structure) */
+function ReadableBlocks({ blocks }) {
+  const safeBlocks = Array.isArray(blocks) ? blocks : [];
+  const normalized = safeBlocks
+    .map((b) => ({
+      lines: Array.isArray(b?.lines) ? b.lines.filter(Boolean) : [],
+      leadBoldFirst: Boolean(b?.leadBoldFirst),
+    }))
+    .filter((b) => b.lines.length);
+
+  if (!normalized.length) return null;
+
+  return (
+    <div
+      className={[
+        "mt-4 max-w-prose",
+        "rounded-2xl",
+        "bg-white/55 ring-1 ring-black/5 shadow-soft",
+        "px-5 py-5",
+      ].join(" ")}
+    >
+      <div className="relative pl-4 border-l-2 border-accent-600/25">
+        <div className="space-y-6">
+          {normalized.map((b, bi) => (
+            <div key={bi} className="space-y-3">
+              {b.lines.map((line, li) => (
+                <p
+                  key={li}
+                  className={[
+                    "text-[15px] leading-[1.85] text-ink-700",
+                    b.leadBoldFirst && li === 0 ? "font-medium text-ink-900" : "",
+                  ].join(" ")}
+                >
+                  {line}
+                </p>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="pointer-events-none absolute -left-[2px] top-0 h-10 w-[2px] bg-gradient-to-b from-accent-600/45 to-transparent" />
+      </div>
+    </div>
+  );
+}
+
 export default function Spatiul({ scrollEl }) {
   const [hover1, setHover1] = useState(false);
   const [hover2, setHover2] = useState(false);
@@ -165,7 +333,6 @@ export default function Spatiul({ scrollEl }) {
 
   const observerRoot = scrollEl?.current || null;
 
-  // ✅ Tailwind "sm" breakpoint: under 640px = mobile
   const isMobile = useMediaQuery("(max-width: 639px)");
 
   const [wrapRef] = useInView({ threshold: 0.12 }, observerRoot);
@@ -174,7 +341,6 @@ export default function Spatiul({ scrollEl }) {
   const [textRef, textIn] = useInView({ threshold: 0.22 }, observerRoot);
   const spP = useScrollProgress(wrapRef, scrollEl);
 
-  // ✅ Filosofie: earlier on mobile
   const filoWrapOpts = useMemo(() => ({ threshold: 0.16 }), []);
 
   const filoImgOpts = useMemo(() => {
@@ -191,7 +357,6 @@ export default function Spatiul({ scrollEl }) {
 
   const filoP = useScrollProgress(filoWrapRef, scrollEl);
 
-  // ✅ Trigger zones
   const spQuoteTrigger = imgIn && spP > 0.38;
 
   const fiProgressThreshold = isMobile ? 0.3 : 0.52;
@@ -228,67 +393,87 @@ export default function Spatiul({ scrollEl }) {
     const spImage = resolveMediaUrl(sp.image_1) || spatiulImg1;
     const fiImage = resolveMediaUrl(fi.image_2) || spatiulImg2;
 
-    const spStats =
-      Array.isArray(sp.stats) && sp.stats.length === 3
-        ? sp.stats
-        : [
-            { value: "1956", label: "MARMURĂ" },
-            { value: "4m", label: "LUMINĂ NORD" },
-            { value: "∞", label: "LINIȘTE" },
-          ];
+    const fallbackSpStats = [
+      { value: "4", label: "Copii într-o grupă.", sublabel: "Nu 12, nu 15." },
+      {
+        value: "100%",
+        label: "Lumină naturală",
+        sublabel: "Percepția corectă a culorilor.",
+      },
+      {
+        value: "0",
+        label: "Zgomot. Presiune.",
+        sublabel: "Competiție inutilă.",
+      },
+    ];
+
+    const spStatsRaw =
+      Array.isArray(sp.stats) && sp.stats.length ? sp.stats : fallbackSpStats;
+
+    const spStats = spStatsRaw.map((s) => {
+      if (typeof s === "string") return { value: s, label: "", sublabel: "" };
+      return {
+        value: String(s?.value ?? "").trim(),
+        label: String(s?.label ?? "").trim(),
+        sublabel: String(s?.sublabel ?? "").trim(),
+      };
+    });
+
+    const rawTitle1 = (fi.title_line_1 || "Sanctuar privat.").trim();
+    const rawTitle2 = (fi.title_line_2 || "Libertate radicală.").trim();
+    const normalized = normalizeTwoLineTitle(rawTitle1, rawTitle2);
 
     return {
       spatiul: {
         label: (sp.label || "( SPAȚIUL )").trim(),
-        title: (sp.title || "Suntem într-un monument.").trim(),
+        title: (sp.title || "Spațiul").trim(),
         paragraphLines: splitLines(sp.paragraph).length
           ? splitLines(sp.paragraph)
           : [
-              "Tavane înalte, lumină naturală de nord și o atmosferă care impune",
-              "respect pentru actul artistic. Spațiul nu e decor — este mentor.",
+              "Căutați un curs de pictură pentru copii în București unde atenția să nu se împartă la 15?",
             ],
         seoBlurbLines: splitLines(sp.seo_blurb),
         hiddenKeywordsRaw: (sp.hidden_keywords || "").trim(),
         image: spImage,
         quote: (
           sp.quote ||
-          "„Numărul strict limitat de locuri asigură că mentorul este un partener de dialog pentru fiecare copil, nu un supraveghetor.”"
+          "Numărul strict limitat de locuri asigură că mentorul este un partener de dialog pentru fiecare copil, nu un supraveghetor."
         ).trim(),
         stats: spStats,
       },
       filosofie: {
         label: (fi.label || "( FILOSOFIA NOASTRĂ )").trim(),
-        title1: (fi.title_line_1 || "Sanctuar Privat.").trim(),
-        title2: (fi.title_line_2 || "Libertate Radicală.").trim(),
-        introLines: splitLines(fi.intro).length
-          ? splitLines(fi.intro)
+        title1: normalized.t1 || "Sanctuar privat.",
+        title2: normalized.t2 || "Libertate radicală.",
+
+        // ✅ IMPORTANT: use splitParagraphs (not splitLines) to avoid hard-wrap look
+        introLines: splitParagraphs(fi.intro).length
+          ? splitParagraphs(fi.intro)
           : [
-              "Departe de agitația comercială, Ateliere la Scânteia oferă un",
-              "spațiu unde timpul curge altfel.",
+              "Răspundem direct celei mai stringente nevoi a părinților: atenția individuală.",
             ],
-        p1Lines: splitLines(fi.paragraph_1).length
-          ? splitLines(fi.paragraph_1)
+        p1Lines: splitParagraphs(fi.paragraph_1).length
+          ? splitParagraphs(fi.paragraph_1)
           : [
-              "Într-un cerc restrâns și securizat, copiii scapă de presiunea",
-              "notelor și a performanței standardizate. Aici găsesc libertatea radicală de a crea fără frică.",
+              "Într-un cerc restrâns și securizat, copiii scapă de presiunea notelor și a performanței standardizate. Aici găsesc libertatea radicală de a crea fără frică.",
             ],
-        p2Lines: splitLines(fi.paragraph_2).length
-          ? splitLines(fi.paragraph_2)
+        p2Lines: splitParagraphs(fi.paragraph_2).length
+          ? splitParagraphs(fi.paragraph_2)
           : [
-              "Oferim materiale profesioniste și spațiu vital imens pentru ca",
-              "cei mici să-și testeze limitele creativității într-un mediu sigur.",
+              "Lucrăm cu materiale profesionale și spațiu vital imens pentru ca cei mici să își testeze limitele creativității într-un mediu sigur.",
             ],
+
         cta: (fi.cta_text || "SOLICITĂ O INVITAȚIE").trim(),
         image: fiImage,
         quote: (
           fi.quote ||
-          "„Un cerc restrâns, un spațiu securizat și materiale profesioniste: aici copilul își poate testa creativitatea fără frica de greșeală, de note sau de presiunea performanței.”"
+          "Numărul strict limitat de locuri asigură că mentorul este un partener de dialog pentru fiecare copil, nu un supraveghetor."
         ).trim(),
       },
     };
   }, [cms]);
 
-  const FRAME = "border border-[#6b1f2a]"; // 1px visiniu
+  const FRAME = "border border-[#6b1f2a]";
 
   const MINI_CARD_BASE = [
     "rounded-2xl",
@@ -306,7 +491,6 @@ export default function Spatiul({ scrollEl }) {
     "break-words [overflow-wrap:anywhere] whitespace-normal",
   ].join(" ");
 
-  // ✅ Use it (no unused-vars)
   const goToMembrie = () => {
     const targetHash = "#membrie";
     if (location?.hash === targetHash) {
@@ -370,7 +554,7 @@ export default function Spatiul({ scrollEl }) {
                 <div className="relative overflow-hidden rounded-[2.15rem] bg-white">
                   <img
                     src={content.spatiul.image}
-                    alt="Spațiul – lumină, materiale, liniște"
+                    alt="Spațiul Ateliere la Scânteia – lumină naturală, liniște, siguranță"
                     className={[
                       "h-[500px] w-full object-cover sm:h-[640px] lg:h-[760px]",
                       "object-[50%_62%] sm:object-[50%_55%] lg:object-[50%_48%]",
@@ -428,25 +612,13 @@ export default function Spatiul({ scrollEl }) {
               </h2>
 
               {!!content.spatiul.seoBlurbLines.length && (
-                <p className="mt-4 max-w-prose text-[13px] leading-relaxed text-ink-600">
-                  {content.spatiul.seoBlurbLines.map((line, idx) => (
-                    <span
-                      key={idx}
-                      className={idx === 0 ? "block" : "mt-1 block"}
-                    >
-                      {line}
-                    </span>
-                  ))}
-                </p>
+                <ReadableLines
+                  lines={content.spatiul.seoBlurbLines}
+                  variant="seo"
+                />
               )}
 
-              <p className="mt-6 max-w-prose text-[15px] leading-relaxed text-ink-700">
-                {content.spatiul.paragraphLines.map((line, idx) => (
-                  <span key={idx} className={idx === 0 ? "block" : "mt-1 block"}>
-                    {line}
-                  </span>
-                ))}
-              </p>
+              <ReadableLines lines={content.spatiul.paragraphLines} variant="body" />
 
               <div className="mt-10 grid grid-cols-3 gap-6">
                 {content.spatiul.stats.map((s, i) => (
@@ -454,9 +626,16 @@ export default function Spatiul({ scrollEl }) {
                     <div className="text-3xl font-semibold text-ink-900">
                       {s.value}
                     </div>
+
                     <div className="mt-1 text-[11px] tracking-[0.22em] text-ink-500">
                       {s.label}
                     </div>
+
+                    {!!s.sublabel && (
+                      <div className="mt-2 max-w-[18ch] text-[12px] leading-snug text-ink-600">
+                        {s.sublabel}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -566,40 +745,22 @@ export default function Spatiul({ scrollEl }) {
 
               <h2 className="text-4xl font-semibold leading-tight text-ink-900 sm:text-5xl">
                 {content.filosofie.title1}
-                <br />
-                <span className="italic">{content.filosofie.title2}</span>
+                {content.filosofie.title2 ? (
+                  <>
+                    <br />
+                    <span className="italic">{content.filosofie.title2}</span>
+                  </>
+                ) : null}
               </h2>
 
-              <p className="mt-6 text-[15px] leading-relaxed text-ink-700">
-                {content.filosofie.introLines.map((line, idx) => (
-                  <span key={idx} className={idx === 0 ? "block" : "mt-1 block"}>
-                    {line}
-                  </span>
-                ))}
-              </p>
-
-              <div className="mt-10 space-y-6 text-[15px] leading-relaxed text-ink-700">
-                <p>
-                  {content.filosofie.p1Lines.map((line, idx) => (
-                    <span
-                      key={idx}
-                      className={idx === 0 ? "block" : "mt-1 block"}
-                    >
-                      {line}
-                    </span>
-                  ))}
-                </p>
-                <p>
-                  {content.filosofie.p2Lines.map((line, idx) => (
-                    <span
-                      key={idx}
-                      className={idx === 0 ? "block" : "mt-1 block"}
-                    >
-                      {line}
-                    </span>
-                  ))}
-                </p>
-              </div>
+              {/* ✅ ONE container (like SPAȚIUL) holding all Filosofie text */}
+              <ReadableBlocks
+                blocks={[
+                  { lines: content.filosofie.introLines, leadBoldFirst: false },
+                  { lines: content.filosofie.p1Lines, leadBoldFirst: false },
+                  { lines: content.filosofie.p2Lines, leadBoldFirst: false },
+                ]}
+              />
 
               <div className="mt-10 flex items-center gap-4">
                 <button

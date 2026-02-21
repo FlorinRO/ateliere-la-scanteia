@@ -309,6 +309,11 @@ WAGTAILSEARCH_BACKENDS = {
     }
 }
 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "no-reply@localhost"
+
+NEWSLETTER_CONFIRM_TTL_HOURS = int(os.getenv("NEWSLETTER_CONFIRM_TTL_HOURS", "72"))
+
 WAGTAILADMIN_BASE_URL = PUBLIC_BASE_URL or "http://localhost:8000"
 
 WAGTAILDOCS_EXTENSIONS = [

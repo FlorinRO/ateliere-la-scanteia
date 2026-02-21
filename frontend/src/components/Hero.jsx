@@ -344,7 +344,8 @@ export default function Hero({ scrollEl }) {
         >
           <p
             className={[
-              "mb-4 text-[12px] sm:text-sm tracking-wideplus text-ink-600",
+              // ✅ Subtitluri / meniu: Plus Jakarta Sans
+              "mb-4 font-jakarta font-medium text-[12px] sm:text-sm tracking-wideplus text-ink-600",
               "transition-all duration-700 ease-out",
               textOn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
             ].join(" ")}
@@ -355,7 +356,8 @@ export default function Hero({ scrollEl }) {
           {/* ✅ Only ONE visible H1 in hero, clean */}
           <h1
             className={[
-              "text-[34px] sm:text-5xl md:text-7xl font-semibold leading-[1.08] sm:leading-tight text-ink-900",
+              // ✅ Titlu principal: Fraunces 900 (Black)
+              "font-fraunces font-black text-[34px] sm:text-5xl md:text-7xl leading-[1.08] sm:leading-tight text-ink-900",
               "transition-all duration-[900ms] ease-out",
               textOn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
             ].join(" ")}
@@ -374,7 +376,8 @@ export default function Hero({ scrollEl }) {
           <p
             className={[
               "relative mx-auto mt-7 sm:mt-8 max-w-2xl",
-              "text-[15px] sm:text-[17px] italic leading-relaxed tracking-[0.035em] sm:tracking-[0.04em]",
+              // ✅ Subtitlu: Plus Jakarta Sans
+              "font-jakarta text-[15px] sm:text-[17px] italic leading-relaxed tracking-[0.035em] sm:tracking-[0.04em]",
               "text-ink-800",
               "transition-all duration-[900ms] ease-out",
               textOn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
@@ -400,13 +403,13 @@ export default function Hero({ scrollEl }) {
           >
             <a
               href="#membrie"
-              className="group relative inline-flex whitespace-nowrap items-center justify-center overflow-hidden rounded-sm bg-accent-600 px-7 py-2.5 sm:px-10 sm:py-3 text-[12px] sm:text-sm font-medium uppercase tracking-[0.18em] sm:tracking-[0.22em] text-white shadow-soft transition-all duration-500 ease-out hover:scale-[1.07] hover:shadow-[0_25px_70px_rgba(127,29,29,0.55)] active:scale-[1.03]"
+              className="group relative inline-flex whitespace-nowrap items-center justify-center overflow-hidden rounded-sm bg-accent-600 px-7 py-2.5 sm:px-10 sm:py-3 text-[12px] sm:text-sm font-jakarta font-bold uppercase tracking-cta text-white shadow-soft transition-all duration-500 ease-out hover:scale-[1.07] hover:shadow-[0_25px_70px_rgba(127,29,29,0.55)] active:scale-[1.03]"
             >
               <span className="pointer-events-none absolute inset-0 opacity-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.45),rgba(127,29,29,0)_65%)] transition-opacity duration-300 group-hover:opacity-100 group-hover:animate-pulse" />
               <span className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/60 to-transparent opacity-0 translate-x-0 transition-[opacity,transform] duration-700 ease-out group-hover:opacity-100 group-hover:translate-x-[220%]" />
               <span className="absolute inset-0 translate-y-full bg-accent-700 transition-transform duration-500 ease-out group-hover:translate-y-0" />
 
-              <span className="relative z-10 flex items-center gap-2 sm:gap-3 whitespace-nowrap transition-all duration-500 sm:group-hover:tracking-[0.35em]">
+              <span className="relative z-10 flex items-center gap-2 sm:gap-3 whitespace-nowrap transition-all duration-500 sm:group-hover:tracking-[0.12em]">
                 Începe procesul de selecție
                 <span className="transition-transform duration-500 group-hover:translate-x-2">
                   →
@@ -423,7 +426,7 @@ export default function Hero({ scrollEl }) {
             ].join(" ")}
             style={{ transitionDelay: textOn ? "520ms" : "0ms" }}
           >
-            <div className="flex items-center gap-2 text-[11px] sm:text-xs tracking-[0.17em] sm:tracking-[0.18em] text-ink-600">
+            <div className="flex items-center gap-2 font-jakarta font-medium text-[11px] sm:text-xs tracking-[0.17em] sm:tracking-[0.18em] text-ink-600">
               <span className="h-[1px] w-10 bg-ink-400/60" />
               DERULEAZĂ
               <span className="h-[1px] w-10 bg-ink-400/60" />

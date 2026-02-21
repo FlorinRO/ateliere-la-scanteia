@@ -1,4 +1,6 @@
+// Footer.jsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
 import cowicofiLogo from "../assets/cocologodark.png";
 import siteLogo from "../assets/Ateliere_la_Scanteia.svg";
 
@@ -7,6 +9,18 @@ export default function Footer() {
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Newsletter state
+  const [email, setEmail] = useState("");
+  const [company, setCompany] = useState(""); // honeypot
+  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  const [message, setMessage] = useState("");
+
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "");
+  const endpoint = useMemo(
+    () => `${API_BASE}/api/newsletter/subscribe/`,
+    [API_BASE]
+  );
 
   const scrollToId = (id, attempt = 0) => {
     const el = document.getElementById(id);
@@ -34,6 +48,62 @@ export default function Footer() {
     requestAnimationFrame(() => scrollToId(id));
   };
 
+  const validateEmail = (value) => {
+    const v = String(value || "").trim();
+    if (!v) return false;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(v);
+  };
+
+  const onSubscribe = async (e) => {
+    e.preventDefault();
+
+    if (company) return;
+
+    const clean = String(email || "").trim();
+    if (!validateEmail(clean)) {
+      setStatus("error");
+      setMessage("Te rog introdu un email valid.");
+      return;
+    }
+
+    setStatus("loading");
+    setMessage("");
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // IMPORTANT: newsletter NU are nevoie de cookies, evităm CORS/CSRF issues
+        credentials: "omit",
+        mode: "cors",
+        body: JSON.stringify({ email: clean }),
+      });
+
+      if (!res.ok) {
+        let detail = "";
+        try {
+          const data = await res.json();
+          detail =
+            data?.detail ||
+            data?.error ||
+            data?.message ||
+            (typeof data === "string" ? data : "");
+        } catch (parseErr) {
+          console.warn("Newsletter error: could not parse JSON response", parseErr);
+        }
+        throw new Error(detail || `Request failed (${res.status})`);
+      }
+
+      setStatus("success");
+      setMessage("Mulțumim! Verifică emailul pentru confirmare.");
+      setEmail("");
+    } catch (err) {
+      console.error("Newsletter subscribe error:", err);
+      setStatus("error");
+      setMessage("Nu am putut salva abonarea acum. Încearcă din nou.");
+    }
+  };
+
   return (
     <footer className="relative bg-[#f4f1ea]">
       {/* Top fade separator */}
@@ -44,7 +114,7 @@ export default function Footer() {
 
       <div className="relative mx-auto w-full max-w-6xl px-6 py-16 pt-14">
         <div className="grid gap-12 md:grid-cols-4">
-          {/* Brand with Logo ONLY */}
+          {/* Brand */}
           <div>
             <img
               src={siteLogo}
@@ -102,25 +172,70 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* CTA */}
-          <div>
+          {/* Newsletter (wider) */}
+          <div className="md:col-span-2">
             <h4 className="text-sm uppercase tracking-[0.25em] text-stone-500">
-              Aplicație
+              Newsletter
             </h4>
             <p className="mt-4 text-sm text-stone-600">
-              Procesul de selecție este deschis pentru un număr limitat de
-              locuri.
+              Fii la curent cu noile sesiuni, locurile disponibile și inițiativele noastre educaționale.
             </p>
 
-            <div className="mt-6">
-              <Link
-                to="/#membrie"
-                onClick={onHashNav("membrie")}
-                className="inline-flex items-center justify-center rounded-full bg-accent-700 px-6 py-3 text-xs tracking-[0.22em] text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-800"
-              >
-                SOLICITĂ ACCES
-              </Link>
-            </div>
+            <form className="mt-6 space-y-3" onSubmit={onSubscribe}>
+              {/* honeypot */}
+              <input
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                autoComplete="off"
+                tabIndex={-1}
+                aria-hidden="true"
+                className="hidden"
+              />
+
+              <div className="flex w-full items-stretch gap-2">
+                <label className="sr-only" htmlFor="newsletter-email">
+                  Email
+                </label>
+                <input
+                  id="newsletter-email"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  placeholder="Email-ul tău"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-full border border-black/10 bg-white/70 px-5 py-3 text-sm text-stone-800 placeholder:text-stone-400 shadow-sm outline-none transition focus:border-black/20 focus:bg-white"
+                />
+
+                <button
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="inline-flex shrink-0 items-center justify-center rounded-full bg-accent-700 px-6 py-3 text-xs tracking-[0.22em] text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-800 disabled:cursor-not-allowed disabled:opacity-70"
+                  aria-label="Abonează-te la newsletter"
+                >
+                  {status === "loading" ? "..." : "SUBSCRIBE"}
+                </button>
+              </div>
+
+              {message ? (
+                <p
+                  className={`text-xs ${
+                    status === "success"
+                      ? "text-emerald-700"
+                      : status === "error"
+                      ? "text-red-700"
+                      : "text-stone-500"
+                  }`}
+                >
+                  {message}
+                </p>
+              ) : (
+                <p className="text-xs text-stone-500">
+                  Fără spam. Te poți dezabona oricând.
+                </p>
+              )}
+            </form>
           </div>
 
           {/* Location */}
@@ -149,7 +264,6 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-16 grid gap-4 border-t border-black/10 pt-6 text-xs text-stone-500 md:grid-cols-3 md:items-center">
-          {/* ✅ Removed Admin button (client will type /admin manually) */}
           <div className="hidden md:block" />
 
           <p className="text-center">

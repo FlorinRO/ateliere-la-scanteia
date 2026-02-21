@@ -6,6 +6,12 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        fraunces: ["Fraunces", "ui-serif", "Georgia", "serif"],
+        jakarta: ["Plus Jakarta Sans", "ui-sans-serif", "system-ui"],
+        instrument: ["Instrument Sans", "ui-sans-serif", "system-ui"],
+      },
+
       colors: {
         canvas: {
           DEFAULT: "#f6f3ee", // crem galerie (background principal)
@@ -29,16 +35,20 @@ export default {
           700: "#6b1a1a",
         },
       },
+
       boxShadow: {
         soft: "0 10px 30px rgba(0, 0, 0, 0.06)",
       },
+
       borderRadius: {
         xl: "1.25rem",
         "2xl": "1.75rem",
         "3xl": "2rem",
       },
+
       letterSpacing: {
         wideplus: "0.18em",
+        cta: "0.04em", // pentru butoanele de înscriere (subtil, elegant)
       },
     },
   },

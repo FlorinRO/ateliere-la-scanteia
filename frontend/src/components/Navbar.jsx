@@ -153,7 +153,8 @@ export default function Navbar() {
             src={Logo}
             alt="Ateliere la Scânteia"
             className={[
-              "h-10 w-auto transition-all duration-300",
+              // ✅ +50% pe desktop + ușor mai mare și pe mobile
+              "h-11 md:h-[60px] w-auto transition-all duration-300",
               scrolled ? "opacity-100" : "opacity-90",
             ].join(" ")}
           />
@@ -161,7 +162,7 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <nav
-          className="hidden flex-1 items-center justify-end gap-8 md:flex"
+          className="hidden flex-1 items-center justify-end gap-8 md:flex font-jakarta"
           aria-label="Primary"
         >
           {NAV_LINKS.map((link) => {
@@ -171,7 +172,7 @@ export default function Navbar() {
                 key={link.to}
                 to={link.to}
                 onClick={id ? onHashNav(id) : undefined}
-                className="group relative text-[13px] tracking-[0.18em] text-ink-700 transition hover:text-ink-900"
+                className="group relative text-[13px] font-medium tracking-[0.18em] text-ink-700 transition hover:text-ink-900"
               >
                 {link.label}
                 <span className="pointer-events-none absolute -bottom-1 left-0 h-[1px] w-0 bg-accent-600/70 transition-all duration-300 group-hover:w-full" />
@@ -182,7 +183,7 @@ export default function Navbar() {
           <Link
             to="/#membrie"
             onClick={onSolicitaAcces}
-            className="group relative inline-flex items-center gap-3 rounded-full border border-accent-600/80 bg-transparent px-5 py-2.5 text-[13px] font-medium tracking-[0.18em] text-ink-800 transition hover:border-accent-600 hover:text-ink-900"
+            className="group relative inline-flex items-center gap-3 rounded-full border border-accent-600/80 bg-transparent px-5 py-2.5 text-[13px] font-jakarta font-bold tracking-cta text-ink-800 transition hover:border-accent-600 hover:text-ink-900"
           >
             <span className="relative">
               Solicită acces
@@ -232,7 +233,11 @@ export default function Navbar() {
           <div className="flex items-center justify-between">
             {/* same click behaviour for mobile logo */}
             <button onClick={onLogoClick} className="p-0 bg-transparent border-0">
-              <img src={Logo} alt="Ateliere la Scânteia" className="h-9 w-auto" />
+              <img
+                src={Logo}
+                alt="Ateliere la Scânteia"
+                className="h-10 w-auto"
+              />
             </button>
             <button
               className="text-black p-2"
@@ -242,7 +247,7 @@ export default function Navbar() {
             </button>
           </div>
 
-          <nav className="mt-6">
+          <nav className="mt-6 font-jakarta">
             <ul className="space-y-2">
               {NAV_LINKS.map((link) => {
                 const id = link.to.split("#")[1];
@@ -251,7 +256,7 @@ export default function Navbar() {
                     <Link
                       to={link.to}
                       onClick={id ? onHashNav(id) : () => setOpen(false)}
-                      className="block py-2 text-[13px] tracking-[0.22em] text-ink-700 hover:text-ink-900 transition"
+                      className="block py-2 text-[13px] font-medium tracking-[0.22em] text-ink-700 hover:text-ink-900 transition"
                     >
                       {link.label}
                     </Link>
@@ -264,7 +269,7 @@ export default function Navbar() {
           <Link
             to="/#membrie"
             onClick={onSolicitaAcces}
-            className="mt-6 block w-full rounded-full border border-accent-600 px-6 py-3 text-center text-[13px] tracking-[0.18em] text-ink-800 hover:bg-accent-50 transition"
+            className="mt-6 block w-full rounded-full border border-accent-600 px-6 py-3 text-center text-[13px] font-jakarta font-bold tracking-cta text-ink-800 hover:bg-accent-50 transition"
           >
             Solicită acces →
           </Link>

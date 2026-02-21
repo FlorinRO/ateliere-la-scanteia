@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const BURGUNDY = "#7f1d1d";
 
@@ -14,8 +14,13 @@ function onlyDigits(v) {
   return String(v || "").replace(/\D+/g, "");
 }
 
+function ageToNumber(ageLabel) {
+  const m = String(ageLabel || "").match(/(\d+)/);
+  return m ? Number(m[1]) : NaN;
+}
+
+// ✅ Min age 4
 const AGE_OPTIONS = [
-  "3 ani",
   "4 ani",
   "5 ani",
   "6 ani",
@@ -32,14 +37,17 @@ const AGE_OPTIONS = [
   "17 ani",
 ];
 
+const QUESTIONS_ENDPOINT = "/api/membrii/questions/";
+
 export default function Membrie() {
   const [step, setStep] = useState(1); // 1..4, 5=success
   const [submitting, setSubmitting] = useState(false);
   const [touched, setTouched] = useState({});
   const [submitError, setSubmitError] = useState("");
 
-  // Optional: set VITE_API_BASE_URL in .env (e.g. http://127.0.0.1:8000)
-  // If empty, it will call same-origin (/api/...)
+  const [questions, setQuestions] = useState([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
+
   const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
 
   const [form, setForm] = useState({
@@ -50,44 +58,128 @@ export default function Membrie() {
     childName: "",
     childAge: "",
 
+    // legacy fallback (only if no CMS questions)
     artRelationship: "",
 
     expectation: "", // hobby | performance
+
+    // ✅ Dynamic answers keyed by MembershipQuestion.key
+    dynamicAnswers: {}, // { [key]: "answer" }
   });
 
+  // ------------------------------------------------------------
+  // ✅ Load CMS questions
+  // ------------------------------------------------------------
+  useEffect(() => {
+    let alive = true;
+
+    async function loadQuestions() {
+      setLoadingQuestions(true);
+      try {
+        const res = await fetch(`${API_BASE}${QUESTIONS_ENDPOINT}`, {
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) throw new Error("questions endpoint not ready");
+
+        const data = await res.json().catch(() => null);
+        const raw = data?.items || data?.questions || [];
+
+        const normalized = Array.isArray(raw)
+          ? raw
+              .filter(Boolean)
+              .map((q, idx) => ({
+                id: q.id ?? q.pk ?? null,
+                key: q.key || q.slug || (q.id != null ? `q_${q.id}` : `q_${idx + 1}`),
+                question_text: q.question_text || q.question || q.text || "",
+                suggested_answer: q.suggested_answer || q.placeholder || q.hint || "",
+                required: Boolean(q.required ?? true),
+                order: Number(q.order ?? idx),
+                is_active: Boolean(q.is_active ?? true),
+              }))
+              .filter((q) => q.is_active && q.question_text.trim())
+              .sort((a, b) => a.order - b.order)
+          : [];
+
+        if (alive) setQuestions(normalized);
+      } catch {
+        if (alive) setQuestions([]);
+      } finally {
+        if (alive) setLoadingQuestions(false);
+      }
+    }
+
+    loadQuestions();
+
+    return () => {
+      alive = false;
+    };
+  }, [API_BASE]);
+
+  // ------------------------------------------------------------
+  // ✅ Validation
+  // ------------------------------------------------------------
   const errors = useMemo(() => {
     const e = {};
 
     // Step 1
     if (!form.parentName.trim()) e.parentName = "Te rugăm completează numele complet.";
-    if (onlyDigits(form.phone).length < 9)
-      e.phone = "Te rugăm completează un număr de telefon valid.";
+    if (onlyDigits(form.phone).length < 9) e.phone = "Te rugăm completează un număr de telefon valid.";
     if (!isEmail(form.email)) e.email = "Te rugăm completează un email valid.";
 
     // Step 2
     if (!form.childName.trim()) e.childName = "Te rugăm completează numele copilului.";
     if (!form.childAge) e.childAge = "Te rugăm selectează vârsta.";
+    if (form.childAge) {
+      const n = ageToNumber(form.childAge);
+      if (!Number.isFinite(n)) e.childAge = "Te rugăm selectează o vârstă validă.";
+      else if (n < 4) e.childAge = "Vârsta minimă este 4 ani.";
+    }
 
     // Step 3
-    if (form.artRelationship.trim().length < 20)
-      e.artRelationship = "Te rugăm scrie câteva detalii (minim 20 caractere).";
+    if (questions.length) {
+      // required CMS questions
+      questions.forEach((q) => {
+        if (!q.required) return;
+        const v = String(form.dynamicAnswers[q.key] || "").trim();
+        if (!v) e[`dyn_${q.key}`] = "Acest câmp este obligatoriu.";
+      });
+    } else {
+      // legacy fallback
+      if (form.artRelationship.trim().length < 20) {
+        e.artRelationship = "Te rugăm scrie câteva detalii (minim 20 caractere).";
+      }
+    }
 
     // Step 4
     if (!form.expectation) e.expectation = "Te rugăm selectează o opțiune.";
 
     return e;
-  }, [form]);
+  }, [form, questions]);
 
   const stepIsValid = useMemo(() => {
     if (step === 1) return !errors.parentName && !errors.phone && !errors.email;
     if (step === 2) return !errors.childName && !errors.childAge;
-    if (step === 3) return !errors.artRelationship;
+    if (step === 3) {
+      if (questions.length) {
+        // no dyn_* errors
+        return !Object.keys(errors).some((k) => k.startsWith("dyn_"));
+      }
+      return !errors.artRelationship;
+    }
     if (step === 4) return !errors.expectation;
     return false;
-  }, [errors, step]);
+  }, [errors, step, questions.length]);
 
   function setField(name, value) {
     setForm((p) => ({ ...p, [name]: value }));
+  }
+
+  function setDynamicAnswer(key, value) {
+    setForm((p) => ({
+      ...p,
+      dynamicAnswers: { ...p.dynamicAnswers, [key]: value },
+    }));
   }
 
   function markTouched(names) {
@@ -101,7 +193,14 @@ export default function Membrie() {
   function next() {
     if (step === 1) markTouched(["parentName", "phone", "email"]);
     if (step === 2) markTouched(["childName", "childAge"]);
-    if (step === 3) markTouched(["artRelationship"]);
+    if (step === 3) {
+      if (questions.length) {
+        markTouched(questions.filter((q) => q.required).map((q) => `dyn_${q.key}`));
+      } else {
+        markTouched(["artRelationship"]);
+      }
+    }
+
     if (!stepIsValid) return;
 
     setSubmitError("");
@@ -113,6 +212,39 @@ export default function Membrie() {
     setStep((s) => Math.max(1, s - 1));
   }
 
+  function buildQaSnapshot() {
+    const qa = [];
+
+    qa.push({ question: "Nume părinte (complet)", answer: form.parentName.trim() });
+    qa.push({ question: "Telefon", answer: form.phone.trim() });
+    qa.push({ question: "Email", answer: form.email.trim() });
+
+    qa.push({ question: "Nume copil", answer: form.childName.trim() });
+    qa.push({ question: "Vârsta copilului", answer: form.childAge });
+
+    if (questions.length) {
+      questions.forEach((q) => {
+        const ans = String(form.dynamicAnswers[q.key] || "").trim();
+        if (ans) qa.push({ question: q.question_text, answer: ans });
+      });
+    } else {
+      qa.push({
+        question: "Descrieți relația copilului cu arta până în prezent",
+        answer: form.artRelationship.trim(),
+      });
+    }
+
+    const expectationLabel =
+      form.expectation === "hobby"
+        ? "Hobby (explorare creativă și dezvoltare personală)"
+        : form.expectation === "performance"
+        ? "Performanță (pregătire pentru o carieră în arte vizuale)"
+        : "";
+    if (expectationLabel) qa.push({ question: "Așteptări", answer: expectationLabel });
+
+    return qa;
+  }
+
   async function submit() {
     markTouched(["expectation"]);
     if (!stepIsValid) return;
@@ -121,22 +253,26 @@ export default function Membrie() {
     setSubmitting(true);
 
     try {
+      const qa_items = buildQaSnapshot();
+
       const payload = {
         parent_name: form.parentName.trim(),
         phone: form.phone.trim(),
         email: form.email.trim(),
         child_name: form.childName.trim(),
         child_age: form.childAge,
-        art_relationship: form.artRelationship.trim(),
-        expectation: form.expectation, // "hobby" | "performance"
+        art_relationship: form.artRelationship.trim(), // legacy
+        expectation: form.expectation,
         source: "website",
+
+        // ✅ Snapshot + fallback
+        qa_items,
+        dynamic_answers: form.dynamicAnswers,
       };
 
       const res = await fetch(`${API_BASE}/api/membrii/applications/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -161,7 +297,6 @@ export default function Membrie() {
   }
 
   const progress = useMemo(() => {
-    // step 1..4 => 0..100
     const s = Math.min(Math.max(step, 1), 4);
     return ((s - 1) / 3) * 100;
   }, [step]);
@@ -171,20 +306,17 @@ export default function Membrie() {
       id="membrie"
       className="relative w-full bg-[#f4f1ea] px-4 pt-20 pb-28 sm:pt-28 sm:pb-36"
     >
-      {/* subtle ambient */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
           className="absolute -top-36 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full blur-3xl"
           style={{
-            background:
-              "radial-gradient(circle, rgba(127,29,29,0.10), rgba(127,29,29,0))",
+            background: "radial-gradient(circle, rgba(127,29,29,0.10), rgba(127,29,29,0))",
           }}
         />
         <div
           className="absolute -bottom-40 right-[-140px] h-[520px] w-[520px] rounded-full blur-3xl"
           style={{
-            background:
-              "radial-gradient(circle, rgba(15,118,110,0.10), rgba(15,118,110,0))",
+            background: "radial-gradient(circle, rgba(15,118,110,0.10), rgba(15,118,110,0))",
           }}
         />
       </div>
@@ -199,24 +331,25 @@ export default function Membrie() {
               ( APLICAȚIE )
             </span>
           </div>
+
           <h1 className="mx-auto max-w-3xl text-4xl leading-[1.05] sm:text-6xl">
             Solicită acces la <span className="italic">comunitatea noastră</span>.
           </h1>
+
+          {loadingQuestions ? (
+            <p className="mt-3 text-sm text-stone-500">Se încarcă formularul…</p>
+          ) : null}
         </div>
 
         <div className="mx-auto w-full max-w-4xl">
           <div className="overflow-hidden rounded-2xl border bg-white/55 p-0 shadow-[0_30px_80px_rgba(0,0,0,0.07)] backdrop-blur-xl">
-            {/* header / steps */}
             <div className="rounded-t-2xl bg-white/45 px-5 py-5 sm:px-8">
               <div className="flex items-center justify-between gap-4">
                 <StepDots step={step} />
               </div>
 
               <div className="mt-4 h-[3px] w-full overflow-hidden rounded-full bg-black/10">
-                <div
-                  className="h-full rounded-full"
-                  style={{ width: `${progress}%`, background: BURGUNDY }}
-                />
+                <div className="h-full rounded-full" style={{ width: `${progress}%`, background: BURGUNDY }} />
               </div>
 
               <div className="mt-3 flex items-center justify-between text-xs text-stone-500">
@@ -224,14 +357,11 @@ export default function Membrie() {
               </div>
             </div>
 
-            {/* content */}
             <div className="px-5 py-8 sm:px-8 sm:py-10">
               {step === 1 && (
                 <div>
                   <h2 className="text-3xl sm:text-4xl">Detalii Părinte</h2>
-                  <p className="mt-2 text-stone-600">
-                    Datele vor fi folosite doar pentru a te contacta.
-                  </p>
+                  <p className="mt-2 text-stone-600">Datele vor fi folosite doar pentru a te contacta.</p>
 
                   <div className="mt-8 grid gap-6">
                     <Field
@@ -269,9 +399,7 @@ export default function Membrie() {
               {step === 2 && (
                 <div>
                   <h2 className="text-3xl sm:text-4xl">Detalii Copil</h2>
-                  <p className="mt-2 text-stone-600">
-                    Doar informațiile necesare pentru a înțelege profilul.
-                  </p>
+                  <p className="mt-2 text-stone-600">Doar informațiile necesare pentru a înțelege profilul.</p>
 
                   <div className="mt-8 grid gap-6">
                     <Field
@@ -288,7 +416,7 @@ export default function Membrie() {
                       value={form.childAge}
                       onChange={(v) => setField("childAge", v)}
                       options={AGE_OPTIONS}
-                      placeholder="Selectează vârsta"
+                      placeholder="Selectează vârsta (minim 4 ani)"
                       error={touched.childAge ? errors.childAge : ""}
                       onBlur={() => markTouched(["childAge"])}
                     />
@@ -298,23 +426,53 @@ export default function Membrie() {
 
               {step === 3 && (
                 <div>
-                  <h2 className="text-3xl sm:text-4xl">Relația cu Arta</h2>
+                  <h2 className="text-3xl sm:text-4xl">{questions.length ? "Întrebări" : "Relația cu Arta"}</h2>
                   <p className="mt-2 text-stone-600">
-                    Descrieți, pe scurt, relația copilului cu arta până în prezent.
+                    {questions.length
+                      ? "Răspunsurile ne ajută să înțelegem contextul copilului. (câmpurile marcate sunt obligatorii)"
+                      : "Descrieți, pe scurt, relația copilului cu arta până în prezent."}
                   </p>
 
-                  <div className="mt-8">
-                    <Textarea
-                      label=""
-                      placeholder="Ce medii artistice a explorat? Ce îl/o fascinează? Există lucrări de care este mândru/mândră?"
-                      value={form.artRelationship}
-                      onChange={(v) => setField("artRelationship", v)}
-                      error={touched.artRelationship ? errors.artRelationship : ""}
-                      onBlur={() => markTouched(["artRelationship"])}
-                    />
-                    <div className="mt-2 text-xs text-stone-500">
-                      Minim 20 caractere. ({form.artRelationship.trim().length}/20)
-                    </div>
+                  <div className="mt-8 grid gap-6">
+                    {questions.length ? (
+                      questions.map((q) => {
+                        const key = `dyn_${q.key}`;
+                        const hasErr = touched[key] ? errors[key] : "";
+                        return (
+                          <Textarea
+                            key={q.key}
+                            label={
+                              q.required ? (
+                                <span>
+                                  {q.question_text} <span className="text-red-700">*</span>
+                                </span>
+                              ) : (
+                                q.question_text
+                              )
+                            }
+                            placeholder={q.suggested_answer || "Scrie răspunsul aici…"}
+                            value={form.dynamicAnswers[q.key] || ""}
+                            onChange={(v) => setDynamicAnswer(q.key, v)}
+                            error={hasErr}
+                            onBlur={() => markTouched([key])}
+                          />
+                        );
+                      })
+                    ) : (
+                      <div>
+                        <Textarea
+                          label=""
+                          placeholder="Ce medii artistice a explorat? Ce îl/o fascinează? Există lucrări de care este mândru/mândră?"
+                          value={form.artRelationship}
+                          onChange={(v) => setField("artRelationship", v)}
+                          error={touched.artRelationship ? errors.artRelationship : ""}
+                          onBlur={() => markTouched(["artRelationship"])}
+                        />
+                        <div className="mt-2 text-xs text-stone-500">
+                          Minim 20 caractere. ({form.artRelationship.trim().length}/20)
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -370,9 +528,7 @@ export default function Membrie() {
                     </span>
                   </div>
                   <h2 className="mt-6 text-3xl sm:text-4xl">Aplicația a fost înregistrată.</h2>
-                  <p className="mx-auto mt-3 max-w-xl text-stone-600">
-                    Comitetul de admitere vă va contacta în 48h.
-                  </p>
+                  <p className="mx-auto mt-3 max-w-xl text-stone-600">Comitetul de admitere vă va contacta în 48h.</p>
 
                   <div className="mt-8 flex justify-center">
                     <button
@@ -387,6 +543,7 @@ export default function Membrie() {
                           childAge: "",
                           artRelationship: "",
                           expectation: "",
+                          dynamicAnswers: {},
                         });
                         setTouched({});
                         setSubmitError("");
@@ -400,7 +557,6 @@ export default function Membrie() {
               )}
             </div>
 
-            {/* footer controls */}
             {step !== 5 && (
               <div className="rounded-b-2xl border-t bg-white/40 px-5 py-5 sm:px-8">
                 <div className="flex items-center justify-between gap-4">
@@ -410,9 +566,7 @@ export default function Membrie() {
                     disabled={step === 1 || submitting}
                     className={cx(
                       "inline-flex items-center gap-3 rounded-full px-3 py-2 text-sm transition",
-                      step === 1 || submitting
-                        ? "text-stone-400"
-                        : "text-stone-700 hover:bg-black/5"
+                      step === 1 || submitting ? "text-stone-400" : "text-stone-700 hover:bg-black/5"
                     )}
                   >
                     <span aria-hidden="true">←</span>
@@ -443,9 +597,7 @@ export default function Membrie() {
                       )}
                       style={{
                         background:
-                          submitting || !stepIsValid
-                            ? undefined
-                            : `linear-gradient(135deg, ${BURGUNDY}, #3f0e0e)`,
+                          submitting || !stepIsValid ? undefined : `linear-gradient(135deg, ${BURGUNDY}, #3f0e0e)`,
                       }}
                     >
                       {submitting ? "Se trimite…" : "Trimite candidatura"}
@@ -458,7 +610,6 @@ export default function Membrie() {
         </div>
       </div>
 
-      {/* bottom breathing room so the page transition blur affects only the background */}
       <div className="pointer-events-none h-16 sm:h-24" />
     </section>
   );
@@ -481,20 +632,14 @@ function StepDots({ step }) {
               )}
               style={{
                 borderColor: "rgba(0,0,0,0.12)",
-                background: active
-                  ? "rgba(127,29,29,0.08)"
-                  : done
-                  ? "rgba(127,29,29,0.10)"
-                  : "rgba(255,255,255,0.55)",
+                background: active ? "rgba(127,29,29,0.08)" : done ? "rgba(127,29,29,0.10)" : "rgba(255,255,255,0.55)",
                 color: active ? BURGUNDY : done ? BURGUNDY : "rgba(0,0,0,0.55)",
               }}
               aria-label={done ? `Pasul ${n} completat` : `Pasul ${n}`}
             >
               {done ? "✓" : n}
             </div>
-            {n !== 4 && (
-              <div className="hidden sm:block h-[2px] w-[7vw] max-w-[140px] rounded-full bg-black/10" />
-            )}
+            {n !== 4 && <div className="hidden sm:block h-[2px] w-[7vw] max-w-[140px] rounded-full bg-black/10" />}
           </div>
         );
       })}
@@ -544,10 +689,7 @@ function Select({ label, placeholder, value, onChange, options, error, onBlur })
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
-          className={cx(
-            "w-full bg-transparent text-[16px] outline-none",
-            value ? "text-stone-800" : "text-stone-400"
-          )}
+          className={cx("w-full bg-transparent text-[16px] outline-none", value ? "text-stone-800" : "text-stone-400")}
         >
           <option value="" disabled>
             {placeholder}
@@ -600,13 +742,7 @@ function ChoiceCard({ title, description, checked, onClick }) {
         "bg-[#f7f4ee] hover:bg-white",
         checked ? "border-black/30" : "border-black/15"
       )}
-      style={
-        checked
-          ? {
-              boxShadow: "0 18px 45px rgba(0,0,0,0.08)",
-            }
-          : undefined
-      }
+      style={checked ? { boxShadow: "0 18px 45px rgba(0,0,0,0.08)" } : undefined}
     >
       <div className="flex items-start gap-4">
         <span
@@ -614,9 +750,7 @@ function ChoiceCard({ title, description, checked, onClick }) {
             "mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border",
             checked ? "border-transparent" : "border-black/20"
           )}
-          style={{
-            background: checked ? "rgba(127,29,29,0.10)" : "rgba(255,255,255,0.5)",
-          }}
+          style={{ background: checked ? "rgba(127,29,29,0.10)" : "rgba(255,255,255,0.5)" }}
           aria-hidden="true"
         >
           <span
