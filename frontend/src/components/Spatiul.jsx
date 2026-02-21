@@ -255,11 +255,13 @@ function ReadableLines({ lines, variant = "body", accent = true }) {
         className={[
           "relative",
           "pl-4",
-          accent ? "border-l-2 border-accent-600/25" : "border-l border-ink-200/70",
+          accent
+            ? "border-l-2 border-accent-600/25"
+            : "border-l border-ink-200/70",
         ].join(" ")}
       >
         <div className={isSEO ? "space-y-2" : "space-y-3"}>
-        {safe.map((line, idx) => (
+          {safe.map((line, idx) => (
             <p
               key={idx}
               className={
@@ -369,22 +371,36 @@ export default function Spatiul({ scrollEl }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // ✅ IMPORTANT: in production, Vite proxy DOES NOT exist.
+  // Use env base URL when available, otherwise fall back to same-origin.
+  const API_BASE = useMemo(() => {
+    const raw = (import.meta.env.VITE_API_BASE_URL || "").trim();
+    return raw ? raw.replace(/\/$/, "") : "";
+  }, []);
+
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/mainpage/", { signal: controller.signal })
+
+    const url = `${API_BASE}/api/mainpage/`;
+
+    fetch(url, {
+      signal: controller.signal,
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+    })
       .then(async (r) => {
         const data = await r.json().catch(() => null);
-        if (!r.ok)
-          throw new Error(`Failed to load mainpage content: ${r.status}`);
+        if (!r.ok) throw new Error(`Failed to load mainpage content: ${r.status}`);
         return data;
       })
       .then((data) => setCms(data))
       .catch((err) => {
         if (err?.name === "AbortError") return;
+        // keep silent (design choice)
       });
 
     return () => controller.abort();
-  }, []);
+  }, [API_BASE]);
 
   const content = useMemo(() => {
     const sp = cms?.spatiul || {};
@@ -618,7 +634,10 @@ export default function Spatiul({ scrollEl }) {
                 />
               )}
 
-              <ReadableLines lines={content.spatiul.paragraphLines} variant="body" />
+              <ReadableLines
+                lines={content.spatiul.paragraphLines}
+                variant="body"
+              />
 
               <div className="mt-10 grid grid-cols-3 gap-6">
                 {content.spatiul.stats.map((s, i) => (
@@ -736,7 +755,9 @@ export default function Spatiul({ scrollEl }) {
                 "lg:col-span-5 lg:order-1",
                 "will-change-transform",
                 "transition-[opacity,transform] duration-[1050ms] ease-out",
-                filoTextIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+                filoTextIn
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-8",
               ].join(" ")}
             >
               <p className="mb-4 text-xs tracking-wideplus text-accent-600">
