@@ -16,6 +16,27 @@ function resolveMediaUrl(url) {
   return url.startsWith("/") ? url : `/${url}`;
 }
 
+function cleanText(s) {
+  return String(s || "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * ✅ Double-enter => paragraf nou
+ * ✅ Newline simplu în interiorul paragrafului => spațiu (elimină hard-wrap)
+ */
+function splitParagraphs(text) {
+  if (!text) return [];
+  const raw = String(text).replace(/\r\n/g, "\n");
+
+  return raw
+    .split(/\n\s*\n+/) // blank lines => paragraphs
+    .map((p) => p.replace(/\n+/g, " ")) // join hard wraps inside paragraph
+    .map((p) => cleanText(p))
+    .filter(Boolean);
+}
+
 function splitLines(text) {
   if (!text) return [];
   return String(text)
@@ -24,46 +45,10 @@ function splitLines(text) {
     .filter(Boolean);
 }
 
-function cleanText(s) {
-  return String(s || "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-/**
- * ✅ Fix for “words jump to next line too early”
- * In CMS textareas, people often paste content that contains HARD line breaks
- * (newlines) inside a paragraph. Your previous splitLines() turned EACH newline
- * into a new <p>, which visually looks like “it wraps even if there's space”.
- *
- * This helper:
- * - keeps real paragraph breaks (blank lines)
- * - removes single newlines inside paragraphs (joins them with spaces)
- */
-function splitParagraphs(text) {
-  if (!text) return [];
-  const raw = String(text).replace(/\r\n/g, "\n");
-
-  // split by blank line(s) => paragraph boundaries
-  const paras = raw
-    .split(/\n\s*\n+/)
-    .map((p) => p.replace(/\n+/g, " ")) // join hard line breaks inside paragraph
-    .map((p) => cleanText(p))
-    .filter(Boolean);
-
-  return paras;
-}
-
 function normForCompare(s) {
   return cleanText(s).toLowerCase();
 }
 
-/**
- * Make sure we always render Filosofie title as 2 clean lines:
- *   Sanctuar privat.
- *   Libertate radicală.
- * even if CMS sends "Sanctuar privat. Libertate radicală." + "Libertate radicală."
- */
 function normalizeTwoLineTitle(raw1, raw2) {
   const a = cleanText(raw1);
   const b = cleanText(raw2);
@@ -100,10 +85,6 @@ function normalizeTwoLineTitle(raw1, raw2) {
   return { t1: a, t2: b };
 }
 
-/**
- * ✅ No setState in effect (passes react-hooks/set-state-in-effect)
- * Uses useSyncExternalStore (React 18).
- */
 function useMediaQuery(query) {
   const getSnapshot = () => {
     if (typeof window === "undefined" || !window.matchMedia) return false;
@@ -203,9 +184,6 @@ function useScrollProgress(ref, scrollEl) {
   return p;
 }
 
-/**
- * ✅ Delayed reveal that RE-RUNS, without setState sync inside effect body
- */
 function useDelayedReveal(when, delayMs = 180) {
   const [on, setOn] = useState(false);
 
@@ -233,55 +211,35 @@ function useDelayedReveal(when, delayMs = 180) {
   return on;
 }
 
-/** Single “card” like SPAȚIUL */
-function ReadableLines({ lines, variant = "body", accent = true }) {
+/**
+ * ✅ plain paragraphs (no card / no long red line)
+ */
+function ReadableLines({ lines, variant = "body" }) {
   const safe = Array.isArray(lines) ? lines.filter(Boolean) : [];
   if (!safe.length) return null;
 
   const isSEO = variant === "seo";
 
   return (
-    <div
-      className={[
-        "mt-4 max-w-prose",
-        "rounded-2xl",
-        isSEO
-          ? "bg-white/45 ring-1 ring-black/5"
-          : "bg-white/55 ring-1 ring-black/5 shadow-soft",
-        "px-5 py-5",
-      ].join(" ")}
-    >
-      <div
-        className={[
-          "relative",
-          "pl-4",
-          accent
-            ? "border-l-2 border-accent-600/25"
-            : "border-l border-ink-200/70",
-        ].join(" ")}
-      >
-        <div className={isSEO ? "space-y-2" : "space-y-3"}>
-          {safe.map((line, idx) => (
-            <p
-              key={idx}
-              className={
-                isSEO
-                  ? "text-[13px] leading-[1.75] text-ink-600"
-                  : "text-[15px] leading-[1.85] text-ink-700"
-              }
-            >
-              {line}
-            </p>
-          ))}
-        </div>
-
-        <div className="pointer-events-none absolute -left-[2px] top-0 h-10 w-[2px] bg-gradient-to-b from-accent-600/45 to-transparent" />
+    <div className="mt-4 max-w-prose">
+      <div className={isSEO ? "space-y-2" : "space-y-4"}>
+        {safe.map((line, idx) => (
+          <p
+            key={idx}
+            className={
+              isSEO
+                ? "text-[13px] leading-[1.75] text-ink-600"
+                : "text-[15px] leading-[1.9] text-ink-700"
+            }
+          >
+            {line}
+          </p>
+        ))}
       </div>
     </div>
   );
 }
 
-/** Single container for multiple blocks (Filosofie should match Spațiul structure) */
 function ReadableBlocks({ blocks }) {
   const safeBlocks = Array.isArray(blocks) ? blocks : [];
   const normalized = safeBlocks
@@ -294,35 +252,22 @@ function ReadableBlocks({ blocks }) {
   if (!normalized.length) return null;
 
   return (
-    <div
-      className={[
-        "mt-4 max-w-prose",
-        "rounded-2xl",
-        "bg-white/55 ring-1 ring-black/5 shadow-soft",
-        "px-5 py-5",
-      ].join(" ")}
-    >
-      <div className="relative pl-4 border-l-2 border-accent-600/25">
-        <div className="space-y-6">
-          {normalized.map((b, bi) => (
-            <div key={bi} className="space-y-3">
-              {b.lines.map((line, li) => (
-                <p
-                  key={li}
-                  className={[
-                    "text-[15px] leading-[1.85] text-ink-700",
-                    b.leadBoldFirst && li === 0 ? "font-medium text-ink-900" : "",
-                  ].join(" ")}
-                >
-                  {line}
-                </p>
-              ))}
-            </div>
+    <div className="mt-4 max-w-prose space-y-8">
+      {normalized.map((b, bi) => (
+        <div key={bi} className="space-y-4">
+          {b.lines.map((line, li) => (
+            <p
+              key={li}
+              className={[
+                "text-[15px] leading-[1.9] text-ink-700",
+                b.leadBoldFirst && li === 0 ? "font-medium text-ink-900" : "",
+              ].join(" ")}
+            >
+              {line}
+            </p>
           ))}
         </div>
-
-        <div className="pointer-events-none absolute -left-[2px] top-0 h-10 w-[2px] bg-gradient-to-b from-accent-600/45 to-transparent" />
-      </div>
+      ))}
     </div>
   );
 }
@@ -371,16 +316,15 @@ export default function Spatiul({ scrollEl }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ IMPORTANT: in production, Vite proxy DOES NOT exist.
-  // Use env base URL when available, otherwise fall back to same-origin.
+  // ✅ DEV: use Vite proxy so it works on phone too
   const API_BASE = useMemo(() => {
+    if (import.meta.env.DEV) return "";
     const raw = (import.meta.env.VITE_API_BASE_URL || "").trim();
     return raw ? raw.replace(/\/$/, "") : "";
   }, []);
 
   useEffect(() => {
     const controller = new AbortController();
-
     const url = `${API_BASE}/api/mainpage/`;
 
     fetch(url, {
@@ -390,13 +334,13 @@ export default function Spatiul({ scrollEl }) {
     })
       .then(async (r) => {
         const data = await r.json().catch(() => null);
-        if (!r.ok) throw new Error(`Failed to load mainpage content: ${r.status}`);
+        if (!r.ok)
+          throw new Error(`Failed to load mainpage content: ${r.status}`);
         return data;
       })
       .then((data) => setCms(data))
       .catch((err) => {
         if (err?.name === "AbortError") return;
-        // keep silent (design choice)
       });
 
     return () => controller.abort();
@@ -443,11 +387,14 @@ export default function Spatiul({ scrollEl }) {
       spatiul: {
         label: (sp.label || "( SPAȚIUL )").trim(),
         title: (sp.title || "Spațiul").trim(),
-        paragraphLines: splitLines(sp.paragraph).length
-          ? splitLines(sp.paragraph)
+
+        // ✅ double-enter = paragraf; newline simplu = spațiu
+        paragraphLines: splitParagraphs(sp.paragraph).length
+          ? splitParagraphs(sp.paragraph)
           : [
               "Căutați un curs de pictură pentru copii în București unde atenția să nu se împartă la 15?",
             ],
+
         seoBlurbLines: splitLines(sp.seo_blurb),
         hiddenKeywordsRaw: (sp.hidden_keywords || "").trim(),
         image: spImage,
@@ -462,7 +409,7 @@ export default function Spatiul({ scrollEl }) {
         title1: normalized.t1 || "Sanctuar privat.",
         title2: normalized.t2 || "Libertate radicală.",
 
-        // ✅ IMPORTANT: use splitParagraphs (not splitLines) to avoid hard-wrap look
+        // ✅ same rule here
         introLines: splitParagraphs(fi.intro).length
           ? splitParagraphs(fi.intro)
           : [
@@ -623,7 +570,8 @@ export default function Spatiul({ scrollEl }) {
                 {content.spatiul.label}
               </p>
 
-              <h2 className="text-4xl font-semibold leading-tight text-ink-900 sm:text-5xl">
+              {/* ✅ Medium 500 + Italic */}
+              <h2 className="text-4xl font-medium italic leading-tight text-ink-900 sm:text-5xl">
                 {content.spatiul.title}
               </h2>
 
@@ -764,17 +712,17 @@ export default function Spatiul({ scrollEl }) {
                 {content.filosofie.label}
               </p>
 
-              <h2 className="text-4xl font-semibold leading-tight text-ink-900 sm:text-5xl">
+              {/* ✅ Medium 500 + Italic (both lines) */}
+              <h2 className="text-4xl font-medium italic leading-tight text-ink-900 sm:text-5xl">
                 {content.filosofie.title1}
                 {content.filosofie.title2 ? (
                   <>
                     <br />
-                    <span className="italic">{content.filosofie.title2}</span>
+                    {content.filosofie.title2}
                   </>
                 ) : null}
               </h2>
 
-              {/* ✅ ONE container (like SPAȚIUL) holding all Filosofie text */}
               <ReadableBlocks
                 blocks={[
                   { lines: content.filosofie.introLines, leadBoldFirst: false },

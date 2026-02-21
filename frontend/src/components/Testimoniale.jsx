@@ -171,7 +171,7 @@ export default function Testimoniale() {
 
           <h2
             className={[
-              "mt-6 text-5xl font-semibold leading-tight md:text-6xl",
+              "mt-5 text-4xl font-medium leading-tight sm:text-5xl",
               "transition-all duration-[900ms] ease-out",
               inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
             ].join(" ")}

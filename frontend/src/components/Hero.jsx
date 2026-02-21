@@ -357,7 +357,7 @@ export default function Hero({ scrollEl }) {
           <h1
             className={[
               // ✅ Titlu principal: Fraunces 900 (Black)
-              "font-fraunces font-black text-[34px] sm:text-5xl md:text-7xl leading-[1.08] sm:leading-tight text-ink-900",
+              "font-fraunces font-extrabold text-[30px] sm:text-4xl md:text-6xl leading-[1.1] sm:leading-tight text-ink-900",
               "transition-all duration-[900ms] ease-out",
               textOn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
             ].join(" ")}

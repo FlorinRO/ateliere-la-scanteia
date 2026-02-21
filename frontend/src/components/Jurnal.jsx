@@ -887,10 +887,10 @@ export default function Jurnal() {
           </p>
 
           <div className="mt-5 flex flex-wrap items-end justify-between gap-5">
-            <h2 className="max-w-4xl text-4xl font-semibold leading-[1.05] text-ink-900 sm:text-6xl">
-              {index.title}
-              <span className="italic"> {index.subtitle}</span>
-            </h2>
+          <h2 className="max-w-4xl text-3xl font-medium leading-[1.08] text-ink-900 sm:text-5xl">
+            {index.title}
+            <span className="italic"> {index.subtitle}</span>
+          </h2>
 
             <Link
               to="/jurnal"
@@ -1398,9 +1398,9 @@ export function JurnalArticlePage() {
 
         {/* ✅ Title moved BELOW header */}
         <div className="mt-8 px-6 sm:px-0">
-          <h1 className="text-4xl font-semibold leading-[1.05] text-ink-900 sm:text-6xl">
-            {patchedA.title}
-          </h1>
+        <h1 className="text-3xl font-medium leading-[1.08] text-ink-900 sm:text-5xl">
+          {patchedA.title}
+        </h1>
 
           {patchedA.excerpt ? (
             <p className="mt-5 max-w-4xl text-[15px] italic leading-relaxed text-ink-700/90 sm:text-[16px]">

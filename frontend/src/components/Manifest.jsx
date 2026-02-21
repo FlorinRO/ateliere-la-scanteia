@@ -47,8 +47,11 @@ export default function Manifest() {
   const fallbackLabel = "( PROCESUL DE SELECȚIE )";
   const fallbackTitle = "Accesul este limitat la\n12 membri pe sezon.";
   const fallbackText =
-    "Căutăm familii care înțeleg că educația estetică este o investiție pe viață.\nNu vindem cursuri. Construim fundații artistice.";
-
+  "Ne adresăm familiilor care înțeleg că educația estetică se formează devreme și rămâne pentru totdeauna.\n" +
+  "Că sensibilitatea și discernământul vizual se cultivă în timp.\n\n" +
+  "Nu oferim „activități creative” de weekend. Protejăm un loc în care copilul învață să privească înainte să judece, să aibă răbdare înainte să finalizeze și să aleagă înainte să copieze.\n\n" +
+  "Și de cele mai multe ori, defapt, noi învățăm de la ei.";
+  
   // ✅ Removed forced line breaks (\n) from fallback card texts (no words changed)
   const fallbackCards = [
     {
@@ -88,11 +91,11 @@ export default function Manifest() {
   const cardsToRender =
     cms?.cards && cms.cards.length ? cms.cards.slice(0, 3) : fallbackCards;
 
-  const icons = [
-    <IconGroup key="i1" />,
-    <IconCap key="i2" />,
-    <IconArchive key="i3" />,
-  ];
+    const icons = [
+      <IconSun key="i1" />,
+      <IconCap key="i2" />,
+      <IconArchive key="i3" />,
+    ];
 
   // ✅ "12 membri" stays on same line; 12 uses alt font, same color, slightly smaller
   const renderTitleWithStyled12 = (text) => {
@@ -179,20 +182,17 @@ export default function Manifest() {
             {labelText}
           </p>
 
-          <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold leading-[1.08] text-ink-900 sm:text-6xl">
+          <h2 className="mx-auto mt-4 max-w-3xl text-3xl font-medium leading-[1.12] text-ink-900 sm:text-5xl">
             {titleLines.length <= 1 ? (
               renderTitleWithStyled12(titleLines[0] || "")
             ) : (
               <>
                 {renderTitleWithStyled12(titleLines[0])}
                 <br />
-                <span className="italic">
-                  {renderTitleWithStyled12(titleLines.slice(1).join(" "))}
-                </span>
+                {renderTitleWithStyled12(titleLines.slice(1).join(" "))}
               </>
             )}
           </h2>
-
           <p className="mx-auto mt-6 max-w-2xl text-[15px] leading-relaxed text-ink-700">
             {textBody.split("\n").map((line, i, arr) => (
               <span key={i}>
@@ -322,6 +322,26 @@ function IconGroup() {
       />
       <path
         d="M4.7 21c.3-2 .9-3.2 1.8-4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconSun() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <circle
+        cx="12"
+        cy="12"
+        r="4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M16.9 16.9l2.1 2.1M2 12h3M19 12h3M4.9 19.1l2.1-2.1M16.9 7.1l2.1-2.1"
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"

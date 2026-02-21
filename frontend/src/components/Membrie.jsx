@@ -332,7 +332,7 @@ export default function Membrie() {
             </span>
           </div>
 
-          <h1 className="mx-auto max-w-3xl text-4xl leading-[1.05] sm:text-6xl">
+          <h1 className="mx-auto max-w-3xl text-3xl font-medium leading-[1.1] sm:text-5xl">
             Solicită acces la <span className="italic">comunitatea noastră</span>.
           </h1>
 

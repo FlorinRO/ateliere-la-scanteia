@@ -37,9 +37,6 @@ NEW_SPATIUL_PARAGRAPH = (
     "monument istoric nu este o relicvă, ci o pânză albă. Iar aici, educația vizuală devine un act de\n"
     "încredere: încrederea că, într-un spațiu care a servit odată conformității, se pot naște acum cele\n"
     "mai libere idei.\n"
-    "Locație monumentală. Siguranță absolută. Acolo unde educația de masă face compromisuri,\n"
-    "Ateliere la Scânteia livrează o garanție fermă: un mediu de învățare inspirațional, izolat de\n"
-    "factorii de stres, proiectat pentru dezvoltare creativă."
 )
 NEW_TEXTBOX_QUOTE = (
     "Numărul strict limitat de locuri asigură că mentorul este un partener de dialog pentru fiecare copil, nu un supraveghetor."
@@ -55,7 +52,7 @@ NEW_SP_STAT_2_SUB = "Percepția corectă a culorilor."
 
 NEW_SP_STAT_3_VALUE = "0"
 NEW_SP_STAT_3_LABEL = "Zgomot. Presiune."
-NEW_SP_STAT_3_SUB = "Competiție inutilă."
+NEW_SP_STAT_3_SUB = "Fără competiție inutilă."
 
 NEW_FI_TITLE_1 = "Sanctuar privat."
 NEW_FI_TITLE_2 = "Libertate radicală."
@@ -361,12 +358,14 @@ class MainPageContent(BaseSiteSetting):
         default="Accesul este limitat la\n12 membri pe sezon.",
     )
     manifest_text = models.TextField(
-        blank=True,
-        default=(
-            "Căutăm familii care înțeleg că educația estetică este o investiție pe viață.\n"
-            "Nu vindem cursuri. Construim fundații artistice."
-        ),
-    )
+    blank=True,
+    default=(
+        "Ne adresăm familiilor care înțeleg că educația estetică se formează devreme și rămâne pentru totdeauna.\n"
+        "Că sensibilitatea și discernământul vizual se cultivă în timp.\n\n"
+        "Nu oferim „activități creative” de weekend. Protejăm un loc în care copilul învață să privească înainte să judece, să aibă răbdare înainte să finalizeze și să aleagă înainte să copieze.\n\n"
+        "Și de cele mai multe ori, defapt, noi învățăm de la ei."
+    ),
+)
 
     manifest_card_1_title = models.CharField(
         max_length=255, blank=True, default=NEW_MANIFEST_CARD_1_TITLE

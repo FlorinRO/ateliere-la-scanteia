@@ -59,7 +59,7 @@ def mainpage_content(request):
     parts = [p.strip() for p in re.split(r"\n\s*\n+", fi_raw) if p.strip()]
     fi_intro = parts[0] if len(parts) > 0 else ""
     fi_p1 = parts[1] if len(parts) > 1 else ""
-    fi_p2 = parts[2] if len(parts) > 2 else ""
+    fi_p2 = "\n\n".join(parts[2:]).strip() if len(parts) > 2 else ""
 
     return JsonResponse(
         {
