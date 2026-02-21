@@ -1,16 +1,18 @@
 # urls.py
+import os
+
 from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import include, path, re_path
 from django.contrib import admin
 from django.http import HttpResponse
 from django.views.decorators.cache import never_cache
 
 from wagtail.admin import urls as wagtailadmin_urls
-from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
-
 from wagtail.api.v2.views import PagesAPIViewSet
 from wagtail.api.v2.router import WagtailAPIRouter
+from wagtail import urls as wagtail_urls
 
 from django.contrib.sitemaps.views import sitemap
 from core.sitemaps import JurnalSitemap, JurnalIndexSitemap
@@ -23,11 +25,9 @@ from core.views import (
     membrie_application,
     membership_questions,
     robots_txt,
-    newsletter_subscribe,  # ✅ NEW
-    newsletter_confirm,    # ✅ NEW
+    newsletter_subscribe,
+    newsletter_confirm,
 )
-
-import os
 
 api_router = WagtailAPIRouter("wagtailapi")
 api_router.register_endpoint("pages", PagesAPIViewSet)
@@ -91,19 +91,23 @@ urlpatterns = [
         {"sitemaps": sitemaps},
         name="django.contrib.sitemaps.views.sitemap",
     ),
+
+    # (Optional) Wagtail-rendered pages (kept out of SPA catch-all)
+    path("cms/", include(wagtail_urls)),
 ]
 
+# ✅ Serve MEDIA in production too (important on Railway when no nginx is serving /media)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 if settings.DEBUG:
-    from django.conf.urls.static import static
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
     urlpatterns += staticfiles_urlpatterns()
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+# ✅ SPA fallback — DO NOT hijack /media, /static, /assets (otherwise images become HTML)
 urlpatterns += [
-    re_path(r"^(?!api/|admin/|documents/|django-admin/|sitemap\.xml$|robots\.txt$).*$", spa_index),
-]
-
-urlpatterns += [
-    path("", include(wagtail_urls)),
+    re_path(
+        r"^(?!api/|admin/|documents/|django-admin/|sitemap\.xml$|robots\.txt$|media/|static/|assets/|favicon\.ico$).*$",
+        spa_index,
+    ),
 ]

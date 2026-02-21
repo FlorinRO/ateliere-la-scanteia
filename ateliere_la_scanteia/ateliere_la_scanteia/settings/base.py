@@ -287,7 +287,9 @@ STATICFILES_DIRS = [
 STATIC_ROOT = BASE_DIR / "static"
 STATIC_URL = "/static/"
 
-MEDIA_ROOT = BASE_DIR / "media"
+# ✅ IMPORTANT for Railway Volume:
+# Set DJANGO_MEDIA_ROOT=/app/media in Railway (backend service) so uploads persist across redeploys.
+MEDIA_ROOT = Path(os.getenv("DJANGO_MEDIA_ROOT", str(BASE_DIR / "media")))
 MEDIA_URL = "/media/"
 
 STORAGES = {
@@ -308,6 +310,7 @@ WAGTAILSEARCH_BACKENDS = {
         "BACKEND": "wagtail.search.backends.database",
     }
 }
+
 # Keep SMTP in production; use console backend only in local DEBUG
 if DEBUG and not (os.getenv("DJANGO_EMAIL_HOST_USER") and os.getenv("DJANGO_EMAIL_HOST_PASSWORD")):
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
