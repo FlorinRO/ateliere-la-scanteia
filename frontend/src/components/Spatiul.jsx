@@ -442,7 +442,7 @@ export default function Spatiul({ scrollEl }) {
     return {
       spatiul: {
         label: (sp.label || "( SPAȚIUL )").trim(),
-        title: (sp.title || "Spațiul").trim(),
+        title: (sp.title || "Suntem într-un monument.").trim(),
         paragraphLines: splitLines(sp.paragraph).length
           ? splitLines(sp.paragraph)
           : [
