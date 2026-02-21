@@ -730,6 +730,7 @@ export default function Spatiul({ scrollEl }) {
                   { lines: content.filosofie.p2Lines, leadBoldFirst: false },
                 ]}
               />
+              
 
               <div className="mt-10 flex items-center gap-4">
                 <button
