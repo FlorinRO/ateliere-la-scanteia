@@ -308,9 +308,9 @@ WAGTAILSEARCH_BACKENDS = {
         "BACKEND": "wagtail.search.backends.database",
     }
 }
-
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-DEFAULT_FROM_EMAIL = "no-reply@localhost"
+# Keep SMTP in production; use console backend only in local DEBUG
+if DEBUG and not (os.getenv("DJANGO_EMAIL_HOST_USER") and os.getenv("DJANGO_EMAIL_HOST_PASSWORD")):
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 NEWSLETTER_CONFIRM_TTL_HOURS = int(os.getenv("NEWSLETTER_CONFIRM_TTL_HOURS", "72"))
 
