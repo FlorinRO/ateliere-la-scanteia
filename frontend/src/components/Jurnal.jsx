@@ -4,10 +4,10 @@ import { Link, useParams } from "react-router-dom";
 import jurnal1 from "../assets/jurnal1.jpeg";
 import jurnal2 from "../assets/jurnal2.jpeg";
 import jurnal3 from "../assets/jurnal3.jpeg";
-
+import jurnalSpatiulMentor2 from "../assets/jurnal-spatiul-mentor.jpeg";
+import jurnalProfesorArte2 from "../assets/jurnal-profesor-arte.jpeg";
 // NEW: extra images for carousels (as requested)
-const jurnalSpatiulMentor2 = "/assets/jurnal-spatiul-mentor.jpeg";
-const jurnalProfesorArte2 = "/assets/jurnal-profesor-arte.jpeg";
+
 
 
 /**
