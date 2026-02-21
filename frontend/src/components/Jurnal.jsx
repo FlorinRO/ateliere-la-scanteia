@@ -6,7 +6,6 @@ import jurnal2 from "../assets/jurnal2.jpeg";
 import jurnal3 from "../assets/jurnal3.jpeg";
 import jurnalSpatiulMentor2 from "../assets/jurnal-spatiul-mentor.jpeg";
 import jurnalProfesorArte2 from "../assets/jurnal-profesor-arte.jpeg";
-// NEW: extra images for carousels (as requested)
 
 
 
