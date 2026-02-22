@@ -17,9 +17,9 @@ try:
     from dotenv import load_dotenv
 
     for env_path in (
-        BASE_DIR / ".env",          # repo root (one level above PROJECT_DIR)
-        PROJECT_DIR / ".env",       # inside ateliere_la_scanteia folder
-        Path.cwd() / ".env",        # where manage.py is executed from
+        BASE_DIR / ".env",  # repo root (one level above PROJECT_DIR)
+        PROJECT_DIR / ".env",  # inside ateliere_la_scanteia folder
+        Path.cwd() / ".env",  # where manage.py is executed from
     ):
         if env_path.exists():
             load_dotenv(env_path, override=True)
@@ -35,7 +35,11 @@ except Exception:
 DEBUG = os.getenv("DJANGO_DEBUG", "").strip() == "1"
 
 # Use env var in production
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY") or os.getenv("SECRET_KEY") or "dev-insecure-secret-key-change-me"
+SECRET_KEY = (
+    os.getenv("DJANGO_SECRET_KEY")
+    or os.getenv("SECRET_KEY")
+    or "dev-insecure-secret-key-change-me"
+)
 
 # Public base URL (set this on Railway)
 # Example: https://ateliere-la-scanteia-production.up.railway.app
@@ -43,6 +47,7 @@ PUBLIC_BASE_URL = (os.getenv("PUBLIC_BASE_URL") or "").strip().rstrip("/")
 
 # Railway sometimes exposes a public domain env var; keep it optional
 RAILWAY_PUBLIC_DOMAIN = (os.getenv("RAILWAY_PUBLIC_DOMAIN") or "").strip()
+
 
 # Helper to extract host from a URL
 def _host_from_url(url: str) -> str:
@@ -94,7 +99,6 @@ INSTALLED_APPS = [
     "django_filters",
     "rest_framework",
     "corsheaders",
-
     # Django contrib apps
     "django.contrib.admin",
     "django.contrib.auth",
@@ -104,7 +108,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
     "django.contrib.postgres",  # ✅ REQUIRED for Postgres search fields / GinIndex
-
     "core",
 ]
 
@@ -179,7 +182,9 @@ else:
 # PASSWORD VALIDATION
 # ------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -261,7 +266,15 @@ DEFAULT_FROM_EMAIL = os.getenv("DJANGO_DEFAULT_FROM_EMAIL", "no-reply@cowicofi.e
 
 EMAIL_HOST = os.getenv("DJANGO_EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.getenv("DJANGO_EMAIL_PORT", "587"))
-EMAIL_USE_TLS = os.getenv("DJANGO_EMAIL_USE_TLS", "1") == "1"
+
+# ✅ Support both TLS (587) and SSL (465)
+EMAIL_USE_TLS = os.getenv("DJANGO_EMAIL_USE_TLS", "0") == "1"
+EMAIL_USE_SSL = os.getenv("DJANGO_EMAIL_USE_SSL", "0") == "1"
+
+# ✅ Guard: if SSL is enabled, TLS must be off
+if EMAIL_USE_SSL:
+    EMAIL_USE_TLS = False
+
 EMAIL_HOST_USER = os.getenv("DJANGO_EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("DJANGO_EMAIL_HOST_PASSWORD", "")
 EMAIL_TIMEOUT = int(os.getenv("DJANGO_EMAIL_TIMEOUT", "20"))
@@ -312,7 +325,9 @@ WAGTAILSEARCH_BACKENDS = {
 }
 
 # Keep SMTP in production; use console backend only in local DEBUG
-if DEBUG and not (os.getenv("DJANGO_EMAIL_HOST_USER") and os.getenv("DJANGO_EMAIL_HOST_PASSWORD")):
+if DEBUG and not (
+    os.getenv("DJANGO_EMAIL_HOST_USER") and os.getenv("DJANGO_EMAIL_HOST_PASSWORD")
+):
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 NEWSLETTER_CONFIRM_TTL_HOURS = int(os.getenv("NEWSLETTER_CONFIRM_TTL_HOURS", "72"))
@@ -320,5 +335,14 @@ NEWSLETTER_CONFIRM_TTL_HOURS = int(os.getenv("NEWSLETTER_CONFIRM_TTL_HOURS", "72
 WAGTAILADMIN_BASE_URL = PUBLIC_BASE_URL or "http://localhost:8000"
 
 WAGTAILDOCS_EXTENSIONS = [
-    "csv", "docx", "key", "odt", "pdf", "pptx", "rtf", "txt", "xlsx", "zip"
+    "csv",
+    "docx",
+    "key",
+    "odt",
+    "pdf",
+    "pptx",
+    "rtf",
+    "txt",
+    "xlsx",
+    "zip",
 ]
